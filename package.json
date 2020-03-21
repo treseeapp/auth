@@ -4,9 +4,8 @@
   "description": "Backend de nuestro AUTH ",
   "main": "index.js",
   "scripts": {
-    "dev": "rm -rf dist/ && tsc && node dist/App.js",
-    "devWindows": "tsc && node dist/App.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "rm -rf dist/ & tsc && node dist/App.js",
+    "devWindows": "rd /s /Q dist & tsc && node dist/App.js"
   },
   "repository": {
     "type": "git",
