@@ -15,5 +15,4 @@ export class UsuarioService {
         return await this.repo.findByEmail(email);
     }
 
-
 }

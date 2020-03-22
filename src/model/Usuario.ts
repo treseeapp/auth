@@ -1,6 +1,5 @@
 import {Column, DataType, Model, Table} from 'sequelize-typescript';
 
-
 /*
 * En este caso no mapeamos todos los campos,
 * ya que aqui en nodeJS solo necesitamos
