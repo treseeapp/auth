@@ -32,7 +32,7 @@ passport.use(new GoogleStrategy({
 
         // Creamos el usuario si no existe con el usuarioService y lo devolvemos al endpoint
 
-        return done(null, user.email);
+        return done(null, usuario.email);
 
     }
 ));

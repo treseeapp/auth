@@ -106,7 +106,7 @@ export class LoginController {
 
         let userManager = new UsuarioService();
 
-        let usuario = new Usuario();
+/*        let usuario = new Usuario();
         usuario.nombre = req.body.nombre;
         usuario.apellidos = req.body.apellidos;
         usuario.direccion = req.body.direccion;
@@ -114,7 +114,8 @@ export class LoginController {
         usuario.dataNacimiento = req.body.dataNacimiento;
         usuario.contraseña = req.body.contraseña;
         usuario.genero = req.body.genero;
-        usuario.modo_inicio_sesion = ModoInicioSesion.LOCAL;
+        usuario.modo_inicio_sesion = ModoInicioSesion.LOCAL;*/
+        // Fala el rol
 
         /*
 
@@ -125,50 +126,50 @@ export class LoginController {
 
          */
 
-        if (req.body.foto_perfil == "") {
-            usuario.foto_perfil = process.env.IMAGE_PROFILE_DEFAULT;
-        } else {
-            usuario.foto_perfil = req.body.foto_perfil;
-        }
+        /*        if (req.body.foto_perfil == "") {
+                    usuario.foto_perfil = process.env.IMAGE_PROFILE_DEFAULT;
+                } else {
+                    usuario.foto_perfil = req.body.foto_perfil;
+                }
 
-        // Aqui podemos controlarlo de otra manera o controlar más campos
-        if (usuario.nombre != "" && usuario.email != "" && usuario.contraseña != "") {
+                // Aqui podemos controlarlo de otra manera o controlar más campos
+                if (usuario.nombre != "" && usuario.email != "" && usuario.contraseña != "") {
 
-            let BCRYPT_SALT_ROUNDS = 12;
+                    let BCRYPT_SALT_ROUNDS = 12;
 
-            await bcrypt.hash(usuario.contraseña, BCRYPT_SALT_ROUNDS, async function (err: Error, hash: any) {
-                usuario.contraseña = hash;
+                    await bcrypt.hash(usuario.contraseña, BCRYPT_SALT_ROUNDS, async function (err: Error, hash: any) {
+                        usuario.contraseña = hash;
 
-                // Podemos crear un método que sea userExist en el Service lo comentamos
-                // Y como he comentado en otras partes el controlar si ya está creado como
-                // usuario de google lo podemos hacer de otra manera
-                // O incluso plantear que puedan tener dos cuenas esto no lo hemos hablado
+                        // Podemos crear un método que sea userExist en el Service lo comentamos
+                        // Y como he comentado en otras partes el controlar si ya está creado como
+                        // usuario de google lo podemos hacer de otra manera
+                        // O incluso plantear que puedan tener dos cuenas esto no lo hemos hablado
 
-/*                await userManager.saveIfNotExist(usuario, async function (exists: boolean, googleUser: boolean) {
-                    if (exists) {
-                        if (googleUser) {
-                            return res.status(BAD_REQUEST).json({
-                                message: "google user"
-                            })
-                        } else {
-                            return res.status(BAD_REQUEST).json({
-                                message: "local user"
-                            })
-                        }
-                    } else {
+        /!*                await userManager.saveIfNotExist(usuario, async function (exists: boolean, googleUser: boolean) {
+                            if (exists) {
+                                if (googleUser) {
+                                    return res.status(BAD_REQUEST).json({
+                                        message: "google user"
+                                    })
+                                } else {
+                                    return res.status(BAD_REQUEST).json({
+                                        message: "local user"
+                                    })
+                                }
+                            } else {
 
-                        return res.status(OK).json({
-                            message: "OK"
-                        })
-                    }
-                });*/
+                                return res.status(OK).json({
+                                    message: "OK"
+                                })
+                            }
+                        });*!/
 
-            });
-        } else {
+                    });
+                } else {
 
-            return res.status(BAD_REQUEST).json({
-                message: "Datos del usuario incompletos",
-            })
-        }
+                    return res.status(BAD_REQUEST).json({
+                        message: "Datos del usuario incompletos",
+                    })*/
     }
+
 }
