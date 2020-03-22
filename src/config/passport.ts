@@ -1,5 +1,6 @@
 import {Usuario} from "../model/Usuario";
 import {UsuarioService} from "../service/usuarioService";
+import {ModoInicioSesion} from "../model/enum/ModoInicioSesion";
 
 let passport = require('passport');
 let GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
@@ -23,10 +24,11 @@ passport.use(new GoogleStrategy({
     async function (accesToken: string, refreshToken: string, profile: any, done: any) {
 
         let usuarioService = new UsuarioService();
-        let user = new Usuario();
+        let usuario = new Usuario();
 
         // Asignamos al usuario creado los valores correspondiente obtenido del Token
 
+        usuario.modo_inicio_sesion=ModoInicioSesion.GOOGLE;
 
         // Creamos el usuario si no existe con el usuarioService y lo devolvemos al endpoint
 

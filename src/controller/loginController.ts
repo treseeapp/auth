@@ -8,6 +8,7 @@ import {UsuarioService} from "../service/usuarioService";
 import * as jwt from "jsonwebtoken";
 import * as passport from "passport";
 import * as bcrypt from "bcrypt";
+import {ModoInicioSesion} from "../model/enum/ModoInicioSesion";
 
 require('../config/Environment');
 require('../config/Passport');
@@ -105,14 +106,15 @@ export class LoginController {
 
         let userManager = new UsuarioService();
 
-        let user = new Usuario();
-        user.name = req.body.nombre;
-        user.last_name = req.body.apellidos;
-        user.last_name = req.body.direccion;
-        user.email = req.body.email;
-        user.last_name = req.body.dataNacimiento;
-        user.last_name = req.body.contraseña;
-        user.password = req.body.genero;
+        let usuario = new Usuario();
+        usuario.nombre = req.body.nombre;
+        usuario.apellidos = req.body.apellidos;
+        usuario.direccion = req.body.direccion;
+        usuario.email = req.body.email;
+        usuario.dataNacimiento = req.body.dataNacimiento;
+        usuario.contraseña = req.body.contraseña;
+        usuario.genero = req.body.genero;
+        usuario.modo_inicio_sesion = ModoInicioSesion.LOCAL;
 
         /*
 
@@ -123,19 +125,26 @@ export class LoginController {
 
          */
 
-        if (req.body.image == "") {
-            user.image = process.env.IMAGE_PROFILE_DEFAULT;
+        if (req.body.foto_perfil == "") {
+            usuario.foto_perfil = process.env.IMAGE_PROFILE_DEFAULT;
         } else {
-            user.image = req.body.image;
+            usuario.foto_perfil = req.body.foto_perfil;
         }
 
-        if (user.name != "" && user.email != "" && user.password != "") {
+        // Aqui podemos controlarlo de otra manera o controlar más campos
+        if (usuario.nombre != "" && usuario.email != "" && usuario.contraseña != "") {
 
             let BCRYPT_SALT_ROUNDS = 12;
 
-            await bcrypt.hash(user.password, BCRYPT_SALT_ROUNDS, async function (err: Error, hash: any) {
-                user.password = hash;
-                await userManager.saveIfNotExist(user, async function (exists: boolean, googleUser: boolean) {
+            await bcrypt.hash(usuario.contraseña, BCRYPT_SALT_ROUNDS, async function (err: Error, hash: any) {
+                usuario.contraseña = hash;
+
+                // Podemos crear un método que sea userExist en el Service lo comentamos
+                // Y como he comentado en otras partes el controlar si ya está creado como
+                // usuario de google lo podemos hacer de otra manera
+                // O incluso plantear que puedan tener dos cuenas esto no lo hemos hablado
+
+/*                await userManager.saveIfNotExist(usuario, async function (exists: boolean, googleUser: boolean) {
                     if (exists) {
                         if (googleUser) {
                             return res.status(BAD_REQUEST).json({
@@ -152,16 +161,13 @@ export class LoginController {
                             message: "OK"
                         })
                     }
-                }).catch(error => {
-                    return res.status(BAD_REQUEST).json({
-                        message: 'FALTEN DADES'
-                    })
-                })
+                });*/
+
             });
         } else {
 
             return res.status(BAD_REQUEST).json({
-                message: "Dades de l'usuari incompletes",
+                message: "Datos del usuario incompletos",
             })
         }
     }
