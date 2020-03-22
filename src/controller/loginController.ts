@@ -9,6 +9,7 @@ import * as jwt from "jsonwebtoken";
 import * as passport from "passport";
 import * as bcrypt from "bcrypt";
 import {ModoInicioSesion} from "../model/enum/ModoInicioSesion";
+import {Sequelize} from "sequelize";
 
 require('../config/enviroment');
 require('../config/passport');
@@ -107,15 +108,16 @@ export class LoginController {
 
         console.log("Entra en el register");
 
-        return res.status(OK).json({
-            message: "Todo OK"
-        });
-
         let userManager = new UsuarioService();
 
-        let usuario = new Usuario();
+        var project = Usuario.build({
+            nombre: 'my awesome project',
+            direccion: 'woot woot. this will make me a rich man'
+        });
 
-        usuario.email = req.body.email;
+
+
+/*        usuario.email = req.body.email;
 
         usuario.apellidos = req.body.apellidos;
         usuario.direccion = req.body.direccion;
@@ -124,7 +126,14 @@ export class LoginController {
         usuario.contraseña = req.body.contraseña;
         usuario.genero = req.body.genero;
         usuario.modo_inicio_sesion = ModoInicioSesion.LOCAL;
-        // Fala el rol
+        usuario.rol = "estudiante";
+        // Fala el rol*/
+
+
+        return res.status(OK).json({
+            message: "Todo OK"
+        });
+
 
         /*
 

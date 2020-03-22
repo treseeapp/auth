@@ -62,6 +62,13 @@ export class Usuario extends Model<Usuario> {
     dataNacimiento: string | undefined;
 
     @Column({
+        field: 'rol',
+        type: 'string'
+
+    })
+    rol: string | undefined;
+
+    @Column({
         field: 'modo_inicio_sesion',
         type: DataType.NUMBER
     })
