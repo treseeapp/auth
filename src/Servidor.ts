@@ -5,6 +5,8 @@ import {Logger} from '@overnightjs/logger';
 import * as cors from 'cors';
 import * as passport from "passport";
 
+import {LoginController} from './controller/loginController';
+
 require('./config/enviroment');
 
 export class Servidor extends Server {
@@ -21,10 +23,10 @@ export class Servidor extends Server {
         /*
         * CORS config
         * */
-        let whiteList:string =<string> process.env.WHITELIST;
-        let array:string[] = whiteList.split(',');
+        let whiteList: string = <string>process.env.WHITELIST;
+        let array: string[] = whiteList.split(',');
 
-        const options:cors.CorsOptions = {
+        const options: cors.CorsOptions = {
             origin: array,
             credentials: true,
             allowedHeaders: 'Authorization, Origin, X-Requested-With, Content-Type, Accept',
@@ -41,9 +43,9 @@ export class Servidor extends Server {
     }
 
     private setupControllers(): void {
-        //const loginController = new LoginController();
+        const loginController = new LoginController();
         //const userController = new UsuarioController();
-        //super.addControllers([userController, loginController]/*, optional router here*/);
+        super.addControllers([loginController]);
     }
 
     public start(port: number): void {

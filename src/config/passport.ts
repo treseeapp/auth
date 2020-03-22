@@ -23,12 +23,14 @@ passport.use(new GoogleStrategy({
     },
     async function (accesToken: string, refreshToken: string, profile: any, done: any) {
 
+        console.log("Llega aquiii");
+
         let usuarioService = new UsuarioService();
         let usuario = new Usuario();
 
         // Asignamos al usuario creado los valores correspondiente obtenido del Token
 
-        usuario.modo_inicio_sesion=ModoInicioSesion.GOOGLE;
+        usuario.modo_inicio_sesion = ModoInicioSesion.GOOGLE;
 
         // Creamos el usuario si no existe con el usuarioService y lo devolvemos al endpoint
 
@@ -38,11 +40,11 @@ passport.use(new GoogleStrategy({
 ));
 
 passport.use(new LocalStrategy({
-        usernameField : 'email',
-        passwordField : 'password',
-        passReqToCallback : true,
+        usernameField: 'email',
+        passwordField: 'password',
+        passReqToCallback: true,
     },
-    async function(req: any, email: string, contraseña: string, done:any, error: any) {
+    async function (req: any, email: string, contraseña: string, done: any, error: any) {
         return done(null, true);
     }
 ));

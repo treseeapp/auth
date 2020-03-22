@@ -16,7 +16,6 @@ require('../config/Passport');
 @Controller('auth/')
 export class LoginController {
 
-
     @Get('google')
     @Middleware(passport.authenticate('google', {scope: ['profile', 'email']}))
     private loginGoogle(req: Request, res: Response) {
