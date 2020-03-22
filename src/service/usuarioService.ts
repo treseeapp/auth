@@ -16,12 +16,24 @@ export class UsuarioService {
         return await this.repo.findByEmail(email);
     }
 
+    async validateUser(usuario:any){
+
+        // Esto es lo mismo que el método findByEmail
+        // Lo comentamos
+        return await this.repo.findByEmail(usuario.email);
+
+    }
+
     async createUser(usuario: any) {
 
         const password = usuario.contraseña;
         const saltRounds = 10;
 
-        usuario.contraseña = await encriptador.hash(password, saltRounds);
+        if (password){
+            console.log("Encripta el password");
+            usuario.contraseña = await encriptador.hash(password, saltRounds);
+        }
+
         await this.repo.create(usuario);
 
     }

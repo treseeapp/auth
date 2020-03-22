@@ -28,14 +28,32 @@ passport.use(new GoogleStrategy({
         console.log(profile);
         console.log(profile.emails[0].value);
 
-/*        let usuarioService = new UsuarioService();
-        let usuario = new Usuario();
+        let usuarioService = new UsuarioService();
 
-        // Asignamos al usuario creado los valores correspondiente obtenido del Token
+        /*
+        Supongo que el createUser ya controla si este usuario ya existe
+        ahora no sé si en Spring tenemos puesto unique hay que mirarlo
+        */
 
-        usuario.modo_inicio_sesion = ModoInicioSesion.GOOGLE;*/
+        /*
+        No lo he mirado mucho pero diria que la fecha de nacimiento, el genero
+        y la dirección no podemos obtenerla. Deberemos completarla en el
+        panel de editar el perfil.
+        */
 
-        // Creamos el usuario si no existe con el usuarioService y lo devolvemos al endpoint
+        await usuarioService.createUser({
+            idusuario: undefined,
+            email: profile.emails[0].value,
+            contraseña: null,
+            nombre: profile.name.givenName,
+            apellidos: profile.name.familyName,
+            direccion: null,
+            genero: 0,
+            dataNacimiento: "2005-00-00",
+            rol: 0,
+            modo_inicio_sesion: 0,
+            foto_perfil: profile.photos[0].value
+        });
 
         return done(null, profile.emails[0].value);
 
@@ -47,7 +65,34 @@ passport.use(new LocalStrategy({
         passwordField: 'password',
         passReqToCallback: true,
     },
-    async function (req: any, email: string, contraseña: string, done: any, error: any) {
-        return done(null, true);
+    async function (req: any, email: string, password: string, done: any, error: any) {
+
+        console.log("Probando");
+
+        /*        console.log("Tiene que llegar al local");
+                console.log(email);
+                console.log(password);
+
+                const service = new UsuarioService();
+
+                // Falta añadir el authMode lo comentamos
+                const userToValidate = {
+                    email: email,
+                    contraseña: password,
+                };
+
+                const result = await service.validateUser(userToValidate);
+
+                console.log("Esto el resultado del validateUser= " + result);
+
+                let userValidated;
+
+                if (result) {
+                    userValidated = await service.findByEmail(userToValidate.email);
+                } else {
+                    userValidated = false;
+                }
+
+                return done(null, userValidated);*/
     }
 ));

@@ -8,8 +8,6 @@ import {UsuarioService} from "../service/usuarioService";
 import * as jwt from "jsonwebtoken";
 import * as passport from "passport";
 import * as bcrypt from "bcrypt";
-import {ModoInicioSesion} from "../model/enum/ModoInicioSesion";
-import {Sequelize} from "sequelize";
 
 require('../config/enviroment');
 require('../config/passport');
@@ -27,9 +25,8 @@ export class LoginController {
     @Middleware(passport.authenticate('google'))
     private loginGoogleCallBack(req: Request, res: Response) {
 
-        console.log(req.user);
-
         // Demomento solo guardamos el correo en el token
+        // Más adelante comentamos si hay que guardar el rol
         const accessToken = jwt.sign({email: req.user}, <string>process.env.JWT_SECRET, {
             expiresIn: process.env.ACCES_TOKEN_EXPIRE,
         });
@@ -46,9 +43,14 @@ export class LoginController {
     private loginLocal(req: Request, res: Response) {
 
         let email = req.body.email;
-        let contraseña = req.body.contraseña;
+        let password = req.body.password;
 
-        passport.authenticate('local', async function (err: any, info: string) {
+        console.log(email);
+        console.log(password);
+
+        console.log("Entra en el controller de login");
+
+        passport.authenticate('local', async function (err: any, info: string)  {
 
             /*
 
@@ -57,54 +59,43 @@ export class LoginController {
 
              */
 
-            let user = new Usuario();
-            let userDB: any;
-            user.email = email;
-            user.contraseña = contraseña;
-            let usuarioService = new UsuarioService();
-
-            userDB = await usuarioService.findByEmail(email);
-
-            if (userDB != null) {
-
-                await bcrypt.compare(user.contraseña, userDB.contraseña, function (err, result) {
-
-                    if (result) {
-
-                        const accessToken = jwt.sign({user: email}, <string>process.env.TOKEN_SECRET_KEY, {
-                            expiresIn: process.env.ACCES_TOKEN_EXPIRE,
-                        });
-
-                        const refreshToken = jwt.sign({user: email}, <string>process.env.TOKEN_SECRET_KEY, {
-                            expiresIn: process.env.REFRESH_TOKEN_EXPIRE,
-                        });
-
-                        res.status(OK).json({
-                            message: "Usuari validat",
-                            accessToken: accessToken,
-                            refreshToken: refreshToken,
-                        })
-
-                        /* Esto es para controlar si el usuario esta haciendo login en local cuando es usuario ya en Google */
-                        /* Como tenemos la aplicación quizá se pueda hacer de otra manera */
-                        /* Lo comentamos juntos */
-
-                    } else if (userDB.contraseña == "NULL") {
-                        return res.status(BAD_REQUEST).json({
-                            message: "google user"
-                        });
-                    }
-                });
-            } else {
+            if (!null) {
                 return res.status(UNAUTHORIZED).json({
-                    message: "No user"
+                    message: "Datos de login inválidos"
                 });
             }
+
+            const accessToken = jwt.sign({user: email}, <string>process.env.TOKEN_SECRET_KEY, {
+                expiresIn: process.env.ACCES_TOKEN_EXPIRE,
+            });
+
+            const refreshToken = jwt.sign({user: email}, <string>process.env.TOKEN_SECRET_KEY, {
+                expiresIn: process.env.REFRESH_TOKEN_EXPIRE,
+            });
+
+            res.status(OK).json({
+                message: "Usuari validat",
+                accessToken: accessToken,
+                refreshToken: refreshToken,
+            })
+
+            /* Esto es para controlar si el usuario esta haciendo login en local cuando es usuario ya en Google */
+            /* Como tenemos la aplicación quizá se pueda hacer de otra manera */
+            /* Lo comentamos juntos */
+
+
         });
     }
 
+
     @Post('register')
     private async registerUser(req: Request, res: Response) {
+
+        /*
+        El tema imágenes hay que concretar como lo queremos tratar demomento
+        lo dejo como que le llega el nombre de la imágen con el que se guarda
+        en Amazon. Y que si no tiene ninguna imágen porque el usuario no ha
+        puesto imágen cogemos una por defecto.*/
 
         let foto_perfil;
 
@@ -116,15 +107,28 @@ export class LoginController {
 
         let usuarioService = new UsuarioService();
 
-        // Habria que comprobar si este usuario existe porque si no
-        // dará un error si un usuario ya registrado intenta
-        // registrarse
+        /*
+        Habria que comprobar si este usuario existe porque si no
+        dará un error si un usuario ya registrado intenta
+        registrarse y también si dejamos que los usuarios de google
+         se registren en local o no */
+
+        /*
+        ¿Habria que comprobar si los campos vienen llenos aunque lo comprobemos
+        en el cliente?. Siento nuestra la API no haría falta pero suponiento que
+        no controlaramos el cliente habría que hacerlo.*/
+
+        /*
+        Hay que discutir si enviamo ya directamente desde el cliente el rol correctamente
+        o lo modificamos aquí, tambíen hay que crear el enum del modo_inicio_sesion */
+
+        console.log(req.body.nombre);
 
         await usuarioService.createUser({
             idusuario: undefined,
             email: req.body.email,
-            contraseña: "",
-            nombre: "JOAN",
+            contraseña: req.body.contraseña,
+            nombre: req.body.nombre,
             apellidos: req.body.apellidos,
             direccion: req.body.direccion,
             genero: 0,
@@ -138,52 +142,7 @@ export class LoginController {
             message: "Todo OK"
         });
 
+        // Si hay error de lo comenado hay que enviar error
 
-        /*
-
-        El tema imágenes hay que concretar como lo queremos tratar demomento
-        lo dejo como que le llega el nombre de la imágen con el que se guarda
-        en Amazon. Y que si no tiene ninguna imágen porque el usuario no ha
-        puesto imágen cogemos una por defecto.
-
-                // Aqui podemos controlarlo de otra manera o controlar más campos
-                if (usuario.nombre != "" && usuario.email != "" && usuario.contraseña != "") {
-
-                    let BCRYPT_SALT_ROUNDS = 12;
-
-                    await bcrypt.hash(usuario.contraseña, BCRYPT_SALT_ROUNDS, async function (err: Error, hash: any) {
-                        usuario.contraseña = hash;
-
-                        // Podemos crear un método que sea userExist en el Service lo comentamos
-                        // Y como he comentado en otras partes el controlar si ya está creado como
-                        // usuario de google lo podemos hacer de otra manera
-                        // O incluso plantear que puedan tener dos cuenas esto no lo hemos hablado
-
-        /!*                await userManager.saveIfNotExist(usuario, async function (exists: boolean, googleUser: boolean) {
-                            if (exists) {
-                                if (googleUser) {
-                                    return res.status(BAD_REQUEST).json({
-                                        message: "google user"
-                                    })
-                                } else {
-                                    return res.status(BAD_REQUEST).json({
-                                        message: "local user"
-                                    })
-                                }
-                            } else {
-
-                                return res.status(OK).json({
-                                    message: "OK"
-                                })
-                            }
-                        });*!/
-
-                    });
-                } else {
-
-                    return res.status(BAD_REQUEST).json({
-                        message: "Datos del usuario incompletos",
-                    })*/
     }
-
 }
