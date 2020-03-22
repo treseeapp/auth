@@ -99,4 +99,70 @@ export class LoginController {
             }
         });
     }
+
+    @Post('register')
+    private async registerUser(req: Request, res: Response) {
+
+        let userManager = new UsuarioService();
+
+        let user = new Usuario();
+        user.name = req.body.nombre;
+        user.last_name = req.body.apellidos;
+        user.last_name = req.body.direccion;
+        user.email = req.body.email;
+        user.last_name = req.body.dataNacimiento;
+        user.last_name = req.body.contraseña;
+        user.password = req.body.genero;
+
+        /*
+
+        El tema imágenes hay que concretar como lo queremos tratar demomento
+        lo dejo como que le llega el nombre de la imágen con el que se guarda
+        en Amazon. Y que si no tiene ninguna imágen porque el usuario no ha
+        puesto imágen cogemos una por defecto.
+
+         */
+
+        if (req.body.image == "") {
+            user.image = process.env.IMAGE_PROFILE_DEFAULT;
+        } else {
+            user.image = req.body.image;
+        }
+
+        if (user.name != "" && user.email != "" && user.password != "") {
+
+            let BCRYPT_SALT_ROUNDS = 12;
+
+            await bcrypt.hash(user.password, BCRYPT_SALT_ROUNDS, async function (err: Error, hash: any) {
+                user.password = hash;
+                await userManager.saveIfNotExist(user, async function (exists: boolean, googleUser: boolean) {
+                    if (exists) {
+                        if (googleUser) {
+                            return res.status(BAD_REQUEST).json({
+                                message: "google user"
+                            })
+                        } else {
+                            return res.status(BAD_REQUEST).json({
+                                message: "local user"
+                            })
+                        }
+                    } else {
+
+                        return res.status(OK).json({
+                            message: "OK"
+                        })
+                    }
+                }).catch(error => {
+                    return res.status(BAD_REQUEST).json({
+                        message: 'FALTEN DADES'
+                    })
+                })
+            });
+        } else {
+
+            return res.status(BAD_REQUEST).json({
+                message: "Dades de l'usuari incompletes",
+            })
+        }
+    }
 }
