@@ -1,4 +1,5 @@
 import {UsuarioRepository} from "../repository/usuarioRepository";
+import {Usuario} from "../model/Usuario";
 
 export class UsuarioService {
     private repo: UsuarioRepository;
@@ -13,6 +14,11 @@ export class UsuarioService {
 
     async findByEmail(email: string) {
         return await this.repo.findByEmail(email);
+    }
+
+    async creataUser(usuario:Usuario){
+
+        await this.repo.create(usuario);
     }
 
 }
