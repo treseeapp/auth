@@ -25,15 +25,15 @@ passport.use(new GoogleStrategy({
 
         console.log("Llega aquiii");
 
-        console.log(accesToken);
+        console.log(profile);
         console.log(profile.emails[0].value);
 
-        /*        let usuarioService = new UsuarioService();
-                let usuario = new Usuario();
+/*        let usuarioService = new UsuarioService();
+        let usuario = new Usuario();
 
-                // Asignamos al usuario creado los valores correspondiente obtenido del Token
+        // Asignamos al usuario creado los valores correspondiente obtenido del Token
 
-                usuario.modo_inicio_sesion = ModoInicioSesion.GOOGLE;*/
+        usuario.modo_inicio_sesion = ModoInicioSesion.GOOGLE;*/
 
         // Creamos el usuario si no existe con el usuarioService y lo devolvemos al endpoint
 

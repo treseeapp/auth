@@ -105,17 +105,25 @@ export class LoginController {
     @Post('register')
     private async registerUser(req: Request, res: Response) {
 
+        console.log("Entra en el register");
+
+        return res.status(OK).json({
+            message: "Todo OK"
+        });
+
         let userManager = new UsuarioService();
 
-/*        let usuario = new Usuario();
-        usuario.nombre = req.body.nombre;
+        let usuario = new Usuario();
+
+        usuario.email = req.body.email;
+
         usuario.apellidos = req.body.apellidos;
         usuario.direccion = req.body.direccion;
         usuario.email = req.body.email;
         usuario.dataNacimiento = req.body.dataNacimiento;
         usuario.contraseña = req.body.contraseña;
         usuario.genero = req.body.genero;
-        usuario.modo_inicio_sesion = ModoInicioSesion.LOCAL;*/
+        usuario.modo_inicio_sesion = ModoInicioSesion.LOCAL;
         // Fala el rol
 
         /*

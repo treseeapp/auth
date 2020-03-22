@@ -1,11 +1,5 @@
 import {Column, DataType, Model, Table} from 'sequelize-typescript';
 
-/*
-* En este caso no mapeamos todos los campos,
-* ya que aqui en nodeJS solo necesitamos
-* los campos necesarios para el inicio
-* de sesion de nuestros usuarios
-* */
 @Table({
     tableName: "usuario",
     createdAt: false,
@@ -32,10 +26,41 @@ export class Usuario extends Model<Usuario> {
     })
     contraseña: string | undefined;
 
+    @Column({
+        field: 'nombre',
+        type: 'string'
 
-    /*Como hibernate, mapeamos un numero que hara
-    referencia a la posicion de un enum, que seran
-    los tipos de login que tenemos*/
+    })
+    nombre: string | undefined;
+
+    @Column({
+        field: 'apellidos',
+        type: 'string'
+
+    })
+    apellidos: string | undefined;
+
+    @Column({
+        field: 'direccion',
+        type: 'string'
+
+    })
+    direccion: string | undefined;
+
+    @Column({
+        field: 'genero',
+        type: 'string'
+
+    })
+    genero: string | undefined;
+
+    @Column({
+        field: 'dataNacimiento',
+        type: 'string'
+
+    })
+    dataNacimiento: string | undefined;
+
     @Column({
         field: 'modo_inicio_sesion',
         type: DataType.NUMBER
