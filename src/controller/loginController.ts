@@ -10,8 +10,8 @@ import * as passport from "passport";
 import * as bcrypt from "bcrypt";
 import {ModoInicioSesion} from "../model/enum/ModoInicioSesion";
 
-require('../config/Environment');
-require('../config/Passport');
+require('../config/enviroment');
+require('../config/passport');
 
 @Controller('auth/')
 export class LoginController {
@@ -26,12 +26,14 @@ export class LoginController {
     @Middleware(passport.authenticate('google'))
     private loginGoogleCallBack(req: Request, res: Response) {
 
+        console.log(req.user);
+
         // Demomento solo guardamos el correo en el token
-        const accessToken = jwt.sign({user: req.user}, <string>process.env.TOKEN_SECRET_KEY, {
+        const accessToken = jwt.sign({email: req.user}, <string>process.env.JWT_SECRET, {
             expiresIn: process.env.ACCES_TOKEN_EXPIRE,
         });
 
-        const refreshToken = jwt.sign({user: req.user}, <string>process.env.TOKEN_SECRET_KEY, {
+        const refreshToken = jwt.sign({email: req.user}, <string>process.env.JWT_SECRET, {
             expiresIn: process.env.REFRESH_TOKEN_EXPIRE,
         });
 

@@ -44,7 +44,6 @@ export class Servidor extends Server {
 
     private setupControllers(): void {
         const loginController = new LoginController();
-        //const userController = new UsuarioController();
         super.addControllers([loginController]);
     }
 

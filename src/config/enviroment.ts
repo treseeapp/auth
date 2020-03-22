@@ -1,3 +1,3 @@
 import * as dotEnv from 'dotenv';
 
-dotEnv.config();
+dotEnv.config({path: __dirname + '/../../.env'});

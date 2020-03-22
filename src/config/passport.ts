@@ -6,7 +6,7 @@ let passport = require('passport');
 let GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
 let LocalStrategy = require('passport-local').Strategy;
 
-require('./Environment');
+require('./enviroment');
 
 passport.serializeUser(function (user: any, done: any) {
     done(null, user);
@@ -25,16 +25,19 @@ passport.use(new GoogleStrategy({
 
         console.log("Llega aquiii");
 
-        let usuarioService = new UsuarioService();
-        let usuario = new Usuario();
+        console.log(accesToken);
+        console.log(profile.emails[0].value);
 
-        // Asignamos al usuario creado los valores correspondiente obtenido del Token
+        /*        let usuarioService = new UsuarioService();
+                let usuario = new Usuario();
 
-        usuario.modo_inicio_sesion = ModoInicioSesion.GOOGLE;
+                // Asignamos al usuario creado los valores correspondiente obtenido del Token
+
+                usuario.modo_inicio_sesion = ModoInicioSesion.GOOGLE;*/
 
         // Creamos el usuario si no existe con el usuarioService y lo devolvemos al endpoint
 
-        return done(null, usuario.email);
+        return done(null, profile.emails[0].value);
 
     }
 ));
