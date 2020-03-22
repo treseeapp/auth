@@ -106,29 +106,33 @@ export class LoginController {
     @Post('register')
     private async registerUser(req: Request, res: Response) {
 
-        console.log("Entra en el register");
+        let foto_perfil;
 
-        let userManager = new UsuarioService();
+        if (req.body.foto_perfil == "") {
+            foto_perfil = process.env.IMAGE_PROFILE_DEFAULT;
+        } else {
+            foto_perfil = req.body.foto_perfil;
+        }
 
-        var project = Usuario.build({
-            nombre: 'my awesome project',
-            direccion: 'woot woot. this will make me a rich man'
+        let usuarioService = new UsuarioService();
+
+        // Habria que comprobar si este usuario existe porque si no
+        // dará un error si un usuario ya registrado intenta
+        // registrarse
+
+        await usuarioService.createUser({
+            idusuario: undefined,
+            email: req.body.email,
+            contraseña: "",
+            nombre: "JOAN",
+            apellidos: req.body.apellidos,
+            direccion: req.body.direccion,
+            genero: 0,
+            dataNacimiento: "2005-00-00",
+            rol: 0,
+            modo_inicio_sesion: 0,
+            foto_perfil: foto_perfil
         });
-
-
-
-/*        usuario.email = req.body.email;
-
-        usuario.apellidos = req.body.apellidos;
-        usuario.direccion = req.body.direccion;
-        usuario.email = req.body.email;
-        usuario.dataNacimiento = req.body.dataNacimiento;
-        usuario.contraseña = req.body.contraseña;
-        usuario.genero = req.body.genero;
-        usuario.modo_inicio_sesion = ModoInicioSesion.LOCAL;
-        usuario.rol = "estudiante";
-        // Fala el rol*/
-
 
         return res.status(OK).json({
             message: "Todo OK"
@@ -141,14 +145,6 @@ export class LoginController {
         lo dejo como que le llega el nombre de la imágen con el que se guarda
         en Amazon. Y que si no tiene ninguna imágen porque el usuario no ha
         puesto imágen cogemos una por defecto.
-
-         */
-
-        /*        if (req.body.foto_perfil == "") {
-                    usuario.foto_perfil = process.env.IMAGE_PROFILE_DEFAULT;
-                } else {
-                    usuario.foto_perfil = req.body.foto_perfil;
-                }
 
                 // Aqui podemos controlarlo de otra manera o controlar más campos
                 if (usuario.nombre != "" && usuario.email != "" && usuario.contraseña != "") {

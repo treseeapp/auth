@@ -55,7 +55,7 @@ export class Usuario extends Model<Usuario> {
     genero: string | undefined;
 
     @Column({
-        field: 'dataNacimiento',
+        field: 'data_nacimiento',
         type: 'string'
 
     })
@@ -73,4 +73,10 @@ export class Usuario extends Model<Usuario> {
         type: DataType.NUMBER
     })
     modo_inicio_sesion: number | undefined;
+
+    @Column({
+        field: 'foto_perfil',
+        type: 'string'
+    })
+    foto_perfil: string | undefined;
 }

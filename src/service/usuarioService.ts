@@ -1,5 +1,5 @@
 import {UsuarioRepository} from "../repository/usuarioRepository";
-import {Usuario} from "../model/Usuario";
+import * as encriptador from "bcrypt";
 
 export class UsuarioService {
     private repo: UsuarioRepository;
@@ -16,9 +16,13 @@ export class UsuarioService {
         return await this.repo.findByEmail(email);
     }
 
-    async creataUser(usuario:Usuario){
+    async createUser(usuario: any) {
 
+        const password = usuario.contraseña;
+        const saltRounds = 10;
+
+        usuario.contraseña = await encriptador.hash(password, saltRounds);
         await this.repo.create(usuario);
-    }
 
+    }
 }
