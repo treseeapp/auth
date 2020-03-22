@@ -3,6 +3,7 @@ import {UsuarioService} from "../service/usuarioService";
 
 let passport = require('passport');
 let GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
+let LocalStrategy = require('passport-local').Strategy;
 
 require('./Environment');
 
@@ -23,5 +24,15 @@ passport.use(new GoogleStrategy({
 
         return done(null, user.email);
 
+    }
+));
+
+passport.use(new LocalStrategy({
+        usernameField : 'email',
+        passwordField : 'password',
+        passReqToCallback : true,
+    },
+    async function(req: any, email: string, contraseña: string, done:any, error: any) {
+        return done(null, true);
     }
 ));
