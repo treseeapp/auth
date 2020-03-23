@@ -23,26 +23,22 @@ export class LoginController {
     }
 
     @Get('google')
-    @Middleware(passport.authenticate('google', {scope: ['profile', 'email', 'https://www.googleapis.com/auth/user.addresses.read','https://www.googleapis.com/auth/user.birthday.read']}))
+    @Middleware(passport.authenticate('google', {scope: ['profile', 'email']}))
     private loginGoogle(req: Request, res: Response) {
         res.end();
     }
-
 
     @Get('google/callback')
     @Middleware(passport.authenticate('google', {
         failureRedirect: '/auth/google/failure'
     }))
     private loginGoogleCallBack(req: Request, res: Response) {
+
         const usuario = req.user;
 
         const accessToken = this.tokenService.tokenGenerator(usuario);
         const refreshToken = this.tokenService.tokenGenerator(usuario, process.env.REFRESH_TOKEN_EXPIRE);
 
-        console.log("Access: ", accessToken);
-        console.log("Refresh: ", refreshToken);
-
-        // Habrá que modificar la ruta si es otra más adelante
         res.redirect(301, process.env.FRONTEND_URL + '/?accessToken=' + accessToken + '&refresh_token=' + refreshToken + '#/login/callback');
     }
 
@@ -50,7 +46,6 @@ export class LoginController {
     private loginGoogleCallBackFailure(req: Request, res: Response) {
         res.redirect(301, process.env.FRONTEND_URL + '/#/login/');
     }
-
 
     @Post('login')
     private async loginLocal(req: Request, res: Response) {
@@ -76,7 +71,7 @@ export class LoginController {
                 /*
                 * Creamos los dos tokens que necesitara el usuario
                 *
-                * La passwd nucna va al token, por eso en el token generator la quitamos
+                * La passwd nuncna va al token, por eso en el token generator la quitamos
                 * */
                 const token = this.tokenService.tokenGenerator(usuario.dataValues);
                 const refresh_token = this.tokenService.tokenGenerator(usuario.dataValues, process.env.REFRESH_TOKEN_EXPIRE);
@@ -93,52 +88,50 @@ export class LoginController {
 
         /*
         * Comprovamos que el usuario ya no exista
-        * Si existe, mandamos un 400 + mensaje 'email ya existe en la ddbb'
+        * Si existe, mandamos un 400 + mensaje 'Este correo ya existe'
         * */
         const email = req.body.email;
         const result = <any>await this.usuarioService.findByEmail(email);
 
-        if (result!==null){
-            // AQUI VA EL ERROR  (BORRAR COMENT)
+        if (result !== null) {
+            return res.status(BAD_REQUEST).statusMessage = "Este correo ya existe"
         }
 
-        /*
-        * TODO
-        *  Comprobar que recibimos campos obligatorios
-        *   Si no se reciben, enviar error 400 + Mensaje
-        * */
+        let genero;
 
+        if (req.body.email && req.body.contraseña && req.body.nombre && req.body.apellidos && req.body.direccion && req.body.dataNacimiento && req.body.genero) {
+            if (req.body.genero == "Hombre") {
+                genero = Genero.HOMBRE;
 
+            } else {
+                genero = Genero.MUJER;
+            }
 
+            /*
+            *  Creamos el usuario
+            * */
+            await this.usuarioService.createUser({
+                email: req.body.email,
+                contraseña: req.body.contraseña,
+                nombre: req.body.nombre,
+                apellidos: req.body.apellidos,
+                direccion: req.body.direccion,
+                genero: genero,
+                dataNacimiento: req.body.dataNacimiento,
+                rol: Rol.ESTUDIANTE,
+                modo_inicio_sesion: ModoInicioSesion.LOCAL,
+                foto_perfil: ''
+            });
 
-        /*
-        * TODO Mirar que genero recibimos
-        *  Seleccionarlo con nuestro enum
-        * */
-        const genero = Genero.INDEFINIDO; // MODIFICAR   (BORRAR)
+            return res.status(OK).statusMessage = "Usuario creado"
 
-        /*
-        * Creamos el usuario
-        * */
-        await this.usuarioService.createUser({
-            email: req.body.email,
-            contraseña: req.body.contraseña,
-            nombre: req.body.nombre,
-            apellidos: req.body.apellidos,
-            direccion: req.body.direccion,
-            genero: genero,
-            dataNacimiento: req.body.dataNacimiento,
-            rol: Rol.ESTUDIANTE,
-            modo_inicio_sesion: ModoInicioSesion.LOCAL,
-            foto_perfil: ''
-        });
-
-        return res.status(OK).statusMessage = "Usuario creado"
+        } else {
+            return res.status(BAD_REQUEST).statusMessage = "Faltan datos del usuario"
+        }
     }
 
     @Post('/auth/refresh/token')
     private async refreshToken(req: Request, res: Response) {
-
 
 
         /*
@@ -171,7 +164,7 @@ export class LoginController {
         * Enviamos el response al cliente
         * */
         res.json({
-            accessToken:'',
+            accessToken: '',
             refreshToken: ''
         })
     }

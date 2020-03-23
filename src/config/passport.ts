@@ -3,6 +3,8 @@ import {ModoInicioSesion} from "../model/enum/ModoInicioSesion";
 import * as passport from "passport";
 import * as passportGoogle from 'passport-google-oauth2';
 import * as localPassport from "passport-local";
+import {Rol} from "../model/enum/Rol";
+import {Genero} from "../model/enum/Genero";
 
 
 const GoogleStrategy = passportGoogle.Strategy;
@@ -28,16 +30,17 @@ passport.use(new GoogleStrategy(
         callbackURL: process.env.GOOGLE_CALLBACK_URL || '',
         passReqToCallback: true
     },
-    async function (request: any, accessToken: string, refreshToken: string, profile: any, done: any) {
+    async function (request: any, accessToken: string, refreshToken: string, profile: any, birthdate: any, done: any) {
         const usuarioService = new UsuarioService();
         const email = profile.email;
         let result;
 
+        console.log(accessToken);
+        console.log(refreshToken);
         console.log(profile);
-
-        console.log(profile);
+        console.log("Esto tiene que serl cumple:");
+        console.log(birthdate);
         result = <any>await usuarioService.findByEmail(email);
-
 
         if (result === null) {
             /*
@@ -48,11 +51,11 @@ passport.use(new GoogleStrategy(
                 contraseña: '',
                 nombre: profile.givenName,
                 apellidos: profile.familyName,
-                direccion: null,
-                genero: 0,
-                dataNacimiento: '2000-01-01',
-                rol: 1,
-                modo_inicio_sesion: 0,
+                direccion: '',
+                genero: Genero.INDEFINIDO,
+                dataNacimiento: '',
+                rol: Rol.ESTUDIANTE,
+                modo_inicio_sesion: ModoInicioSesion.GOOGLE,
                 foto_perfil: profile.photos[0].value
             });
 
@@ -68,7 +71,7 @@ passport.use(new GoogleStrategy(
         const authMode = ModoInicioSesion[user.modo_inicio_sesion];
 
         if (authMode.toLowerCase() !== 'google') {
-            return done(null, false); // Enviar al cb de failure
+            return done(null, false); // TODO Enviar al cb de failure
         } else {
             return done(null, user);
         }
