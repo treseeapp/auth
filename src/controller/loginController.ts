@@ -124,7 +124,6 @@ export class LoginController {
         });
     }
 
-
     @Post('register')
     private async registerUser(req: Request, res: Response) {
 

@@ -22,14 +22,13 @@ passport.use(new GoogleStrategy({
         callbackURL: process.env.GOOGLE_CALLBACK_URL,
     },
     async function (accesToken: string, refreshToken: string, profile: any, done: any) {
+
         const usuarioService = new UsuarioService();
         const email = profile.emails[0].value;
         let result;
 
         console.log(profile)
         result = <any>await usuarioService.findByEmail(email);
-
-
 
 
         if (result ===  null){
