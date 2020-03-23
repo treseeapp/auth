@@ -150,6 +150,8 @@ export class LoginController {
     @Post('/auth/refresh/token')
     private async newToken(req: Request, res: Response) {
 
+        // TODO COMPROBAR QUE FUNCIONA CUANDO PODAMOS HACER PETICIONES
+
         const refreshToken = req.body.refreshToken;
 
         /*

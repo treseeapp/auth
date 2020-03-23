@@ -30,16 +30,13 @@ passport.use(new GoogleStrategy(
         callbackURL: process.env.GOOGLE_CALLBACK_URL || '',
         passReqToCallback: true
     },
-    async function (request: any, accessToken: string, refreshToken: string, profile: any, birthdate: any, done: any) {
+    async function (request: any, accessToken: string, refreshToken: string, profile: any, done: any) {
         const usuarioService = new UsuarioService();
+
         const email = profile.email;
+
         let result;
 
-        console.log(accessToken);
-        console.log(refreshToken);
-        console.log(profile);
-        console.log("Esto tiene que serl cumple:");
-        console.log(birthdate);
         result = <any>await usuarioService.findByEmail(email);
 
         if (result === null) {
@@ -47,13 +44,13 @@ passport.use(new GoogleStrategy(
             * Usuario no existe
             * */
             await usuarioService.createUser({
-                email: profile.emails[0].value,
+                email: profile.email,
                 contraseña: '',
-                nombre: profile.givenName,
-                apellidos: profile.familyName,
+                nombre: profile.given_name,
+                apellidos: profile.family_name,
                 direccion: '',
                 genero: Genero.INDEFINIDO,
-                dataNacimiento: '',
+                dataNacimiento: '0000-00-00',
                 rol: Rol.ESTUDIANTE,
                 modo_inicio_sesion: ModoInicioSesion.GOOGLE,
                 foto_perfil: profile.photos[0].value
@@ -62,7 +59,6 @@ passport.use(new GoogleStrategy(
             result = <any>await usuarioService.findByEmail(email);
         }
         const user = result.dataValues;
-
 
         /*
         * Sacamos el modo de inicio de sesion
