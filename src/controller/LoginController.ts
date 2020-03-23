@@ -1,5 +1,5 @@
-import {OK, BAD_REQUEST, UNAUTHORIZED} from 'http-status-codes';
-import {Controller, Middleware, Get, Post, Put} from '@overnightjs/core';
+import {OK, UNAUTHORIZED} from 'http-status-codes';
+import {Controller, Get, Middleware, Post} from '@overnightjs/core';
 import {Request, Response} from 'express';
 import {UsuarioService} from "../service/UsuarioService";
 import * as passport from "passport";
@@ -34,16 +34,14 @@ export class LoginController {
         failureRedirect: '/auth/google/failure'
     }))
     private loginGoogleCallBack(req: Request, res: Response) {
-        const usuario = req.user;
+        const usuario = <any>req.user;
 
         const accessToken = this.tokenService.tokenGenerator(usuario);
         const refreshToken = this.tokenService.tokenGenerator(usuario, process.env.REFRESH_TOKEN_EXPIRE);
-
-        console.log("Access: ", accessToken);
-        console.log("Refresh: ", refreshToken);
+        const rol = Rol[usuario.rol];
 
         // Habrá que modificar la ruta si es otra más adelante
-        res.redirect(301, process.env.FRONTEND_URL + '/?accessToken=' + accessToken + '&refresh_token=' + refreshToken + '#/login/callback');
+        res.redirect(301, process.env.FRONTEND_URL + '/?accessToken=' + accessToken + '&refreshToken=' + refreshToken + '&rol=' + rol + '#/login/callback');
     }
 
     @Get('google/failure')
@@ -68,6 +66,10 @@ export class LoginController {
             * */
             (req, usuario, info) => {
 
+
+                /*
+                * TODO cambiar esto por el cb de error que cambiaremos en el passport local
+                * */
                 if (!usuario) {
                     res.status(UNAUTHORIZED).statusMessage = 'Datos de login no validos';
                     return res.end()
@@ -80,9 +82,12 @@ export class LoginController {
                 * */
                 const token = this.tokenService.tokenGenerator(usuario.dataValues);
                 const refresh_token = this.tokenService.tokenGenerator(usuario.dataValues, process.env.REFRESH_TOKEN_EXPIRE);
+                const rol = Rol[usuario.rol];
+
                 return res.status(OK).json({
                     access_token: token,
-                    refresh_token: refresh_token
+                    refresh_token: refresh_token,
+                    rol: rol
                 })
 
             })(req, res);
