@@ -1,4 +1,4 @@
-import {OK, UNAUTHORIZED} from 'http-status-codes';
+import {BAD_REQUEST, OK, UNAUTHORIZED} from 'http-status-codes';
 import {Controller, Get, Middleware, Post} from '@overnightjs/core';
 import {Request, Response} from 'express';
 import {UsuarioService} from "../service/UsuarioService";
@@ -98,47 +98,46 @@ export class LoginController {
 
         /*
         * Comprovamos que el usuario ya no exista
-        * Si existe, mandamos un 400 + mensaje 'email ya existe en la ddbb'
+        * Si existe, mandamos un 400 + mensaje 'Este correo ya existe'
         * */
         const email = req.body.email;
         const result = <any>await this.usuarioService.findByEmail(email);
 
-        if (result!==null){
-            // AQUI VA EL ERROR  (BORRAR COMENT)
+        if (result !== null) {
+            return res.status(BAD_REQUEST).statusMessage = "Este correo ya existe"
         }
 
-        /*
-        * TODO
-        *  Comprobar que recibimos campos obligatorios
-        *   Si no se reciben, enviar error 400 + Mensaje
-        * */
+        let genero;
 
+        if (req.body.email && req.body.contraseña && req.body.nombre && req.body.apellidos && req.body.direccion && req.body.dataNacimiento && req.body.genero) {
+            if (req.body.genero == "Hombre") {
+                genero = Genero.HOMBRE;
 
+            } else {
+                genero = Genero.MUJER;
+            }
 
+            /*
+            *  Creamos el usuario
+            * */
+            await this.usuarioService.createUser({
+                email: req.body.email,
+                contraseña: req.body.contraseña,
+                nombre: req.body.nombre,
+                apellidos: req.body.apellidos,
+                direccion: req.body.direccion,
+                genero: genero,
+                dataNacimiento: req.body.dataNacimiento,
+                rol: Rol.ESTUDIANTE,
+                modo_inicio_sesion: ModoInicioSesion.LOCAL,
+                foto_perfil: ''
+            });
 
-        /*
-        * TODO Mirar que genero recibimos
-        *  Seleccionarlo con nuestro enum
-        * */
-        const genero = Genero.INDEFINIDO; // MODIFICAR   (BORRAR)
+            return res.status(OK).statusMessage = "Usuario creado"
 
-        /*
-        * Creamos el usuario
-        * */
-        await this.usuarioService.createUser({
-            email: req.body.email,
-            contraseña: req.body.contraseña,
-            nombre: req.body.nombre,
-            apellidos: req.body.apellidos,
-            direccion: req.body.direccion,
-            genero: genero,
-            dataNacimiento: req.body.dataNacimiento,
-            rol: Rol.ESTUDIANTE,
-            modo_inicio_sesion: ModoInicioSesion.LOCAL,
-            foto_perfil: ''
-        });
-
-        return res.status(OK).statusMessage = "Usuario creado"
+        } else {
+            return res.status(BAD_REQUEST).statusMessage = "Faltan datos del usuario"
+        }
     }
 
     @Post('/auth/refresh/token')
