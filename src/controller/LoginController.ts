@@ -66,7 +66,6 @@ export class LoginController {
             * */
             (req, usuario, info) => {
 
-
                 /*
                 * TODO cambiar esto por el cb de error que cambiaremos en el passport local
                 * */
@@ -151,6 +150,7 @@ export class LoginController {
     @Post('/auth/refresh/token')
     private async refreshToken(req: Request, res: Response) {
 
+        const refreshToken = req.body.refreshToken;
 
         /*
         * Primer paso ! Validamos refresh token
@@ -158,33 +158,23 @@ export class LoginController {
         * 401  + mensaje
         * */
 
+        const validate = this.tokenService.validateToken(refreshToken);
 
-        /*
-        * Cogemos email token refresh
-        *
-        * si token no tiene email
-        * 400 + mensaje oye no tienes email en el token
-        * */
+        if (validate == false) {
+            return res.status(UNAUTHORIZED).statusMessage = "TOKEN NO VALIDO"
+        }
 
+        const usuario = this.tokenService.getUser(refreshToken);
 
-        /*
-        * Validar que existe usuario con ese email
-        *
-        * 400 + mensaje
-        * */
-
-        /*
-        * Creamos los 2 tokens
-        * */
-
+        const newAccesToken = this.tokenService.tokenGenerator(usuario);
+        const newRefreshToken = this.tokenService.tokenGenerator(usuario, process.env.REFRESH_TOKEN_EXPIRE);
 
         /*
         * Enviamos el response al cliente
         * */
-        res.json({
-            accessToken: '',
-            refreshToken: ''
+        res.status(OK).json({
+            accessToken: newAccesToken,
+            refreshToken: newRefreshToken
         })
     }
-
 }
