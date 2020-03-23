@@ -5,7 +5,7 @@ import {Logger} from '@overnightjs/logger';
 import * as cors from 'cors';
 import * as passport from "passport";
 
-import {LoginController} from './controller/loginController';
+import {LoginController} from './controller/LoginController';
 
 require('./config/enviroment');
 
