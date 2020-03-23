@@ -2,12 +2,10 @@ import {OK, BAD_REQUEST, UNAUTHORIZED} from 'http-status-codes';
 import {Controller, Middleware, Get, Post} from '@overnightjs/core';
 import {Request, Response} from 'express';
 
-import {Usuario} from "../model/Usuario";
 import {UsuarioService} from "../service/usuarioService";
 
 import * as jwt from "jsonwebtoken";
 import * as passport from "passport";
-import * as bcrypt from "bcrypt";
 
 require('../config/enviroment');
 require('../config/passport');
@@ -37,6 +35,42 @@ export class LoginController {
 
         // Habrá que modificar la ruta si es otra más adelante
         res.redirect(301, process.env.FRONTEND_URL + '/#/admin/?accessToken=' + accessToken + "&refreshToken=" + refreshToken);
+    }
+
+    @Post('refresh/token')
+    private async newToken(req: Request, res: Response) {
+        let refreshTokenUser = req.body.refreshToken;
+
+        try {
+
+            /* Esto de aqui lo podemos hacer con un tokenService-Manager en vez de hacerlo
+                aqui directamente
+                */
+
+            let decoded: any = jwt.verify(refreshTokenUser, <string>process.env.TOKEN_SECRET_KEY);
+
+            let email = decoded.user;
+
+            const accessToken = jwt.sign({user: email}, <string>process.env.TOKEN_SECRET_KEY, {
+                expiresIn: process.env.ACCES_TOKEN_EXPIRE,
+            });
+
+            const refreshToken = jwt.sign({user: email}, <string>process.env.TOKEN_SECRET_KEY, {
+                expiresIn: process.env.REFRESH_TOKEN_EXPIRE,
+            });
+
+            return res.status(OK).json({
+                message: "Usuari validat",
+                accessToken: accessToken,
+                refreshToken: refreshToken,
+            })
+
+        } catch (err) {
+
+            return res.status(UNAUTHORIZED).json({
+                message: 'REFRESH TOKEN VALIDATE ERROR',
+            });
+        }
     }
 
     @Post('login')

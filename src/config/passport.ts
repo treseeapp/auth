@@ -23,6 +23,12 @@ passport.use(new GoogleStrategy({
     },
     async function (accesToken: string, refreshToken: string, profile: any, done: any) {
 
+    /*
+    Podemos obtener también el cumpleaños y la dirección si no voy mal
+    pero podemos decirir si no rellena el usuario o obtenemos estos
+    valores de Google. Si decidimos que se diten del panel del perfil
+     hay que hacer estos valores nullable */
+
         console.log("Llega aquiii");
 
         console.log(profile);
@@ -33,12 +39,8 @@ passport.use(new GoogleStrategy({
         /*
         Supongo que el createUser ya controla si este usuario ya existe
         ahora no sé si en Spring tenemos puesto unique hay que mirarlo
-        */
-
-        /*
-        No lo he mirado mucho pero diria que la fecha de nacimiento, el genero
-        y la dirección no podemos obtenerla. Deberemos completarla en el
-        panel de editar el perfil.
+        he visto que no lo controla deberiamos comprobar si existe y
+        luego si no existe hacer el create
         */
 
         await usuarioService.createUser({
@@ -51,7 +53,7 @@ passport.use(new GoogleStrategy({
             genero: 0,
             dataNacimiento: "2005-00-00",
             rol: 0,
-            modo_inicio_sesion: 0,
+            modo_inicio_sesion: ModoInicioSesion.GOOGLE,
             foto_perfil: profile.photos[0].value
         });
 
