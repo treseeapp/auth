@@ -29,6 +29,9 @@ passport.use(new GoogleStrategy({
         console.log(profile)
         result = <any>await usuarioService.findByEmail(email);
 
+
+
+
         if (result ===  null){
             /*
             * Usuario no existe
