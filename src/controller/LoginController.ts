@@ -23,7 +23,7 @@ export class LoginController {
     }
 
     @Get('google')
-    @Middleware(passport.authenticate('google', {scope: ['profile', 'email', 'https://www.googleapis.com/auth/user.addresses.read','https://www.googleapis.com/auth/user.birthday.read']}))
+    @Middleware(passport.authenticate('google', {scope: ['profile', 'email', 'https://www.googleapis.com/auth/user.addresses.read', 'https://www.googleapis.com/auth/user.birthday.read']}))
     private loginGoogle(req: Request, res: Response) {
         res.end();
     }
@@ -109,7 +109,14 @@ export class LoginController {
 
         let genero;
 
-        if (req.body.email && req.body.contraseña && req.body.nombre && req.body.apellidos && req.body.direccion && req.body.dataNacimiento && req.body.genero) {
+        if (req.body.email !== "" && req.body.email !== null && req.body.email !== undefined &&
+            req.body.contraseña !== "" && req.body.contraseña !== null && req.body.contraseña !== undefined &&
+            req.body.nombre !== "" && req.body.nombre !== null && req.body.nombre !== undefined &&
+            req.body.apellidos !== "" && req.body.apellidos !== null && req.body.apellidos !== undefined &&
+            req.body.direccion !== "" && req.body.direccion !== null && req.body.direccion !== undefined &&
+            req.body.dataNacimiento !== "" && req.body.dataNacimiento !== null && req.body.dataNacimiento !== undefined &&
+            req.body.genero !== "" && req.body.genero !== null && req.body.genero !== undefined) {
+
             if (req.body.genero == "Hombre") {
                 genero = Genero.HOMBRE;
 
@@ -136,13 +143,13 @@ export class LoginController {
             return res.status(OK).statusMessage = "Usuario creado"
 
         } else {
+            console.log("Hay cambios que faltan");
             return res.status(BAD_REQUEST).statusMessage = "Faltan datos del usuario"
         }
     }
 
     @Post('/auth/refresh/token')
     private async refreshToken(req: Request, res: Response) {
-
 
 
         /*
@@ -175,7 +182,7 @@ export class LoginController {
         * Enviamos el response al cliente
         * */
         res.json({
-            accessToken:'',
+            accessToken: '',
             refreshToken: ''
         })
     }
