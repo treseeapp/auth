@@ -22,41 +22,47 @@ passport.use(new GoogleStrategy({
         callbackURL: process.env.GOOGLE_CALLBACK_URL,
     },
     async function (accesToken: string, refreshToken: string, profile: any, done: any) {
+        const usuarioService = new UsuarioService();
+        const email = profile.emails[0].value;
+        let result;
 
-        console.log("Llega aquiii");
+        console.log(profile)
+        result = <any>await usuarioService.findByEmail(email);
 
-        console.log(profile);
-        console.log(profile.emails[0].value);
+        if (result ===  null){
+            /*
+            * Usuario no existe
+            * */
+            await usuarioService.createUser({
+                idusuario: undefined,
+                email: profile.emails[0].value,
+                contraseña: null,
+                nombre: profile.name.givenName,
+                apellidos: profile.name.familyName,
+                direccion: null,
+                genero: null,
+                dataNacimiento: null,
+                rol: 1,
+                modo_inicio_sesion: 0,
+                foto_perfil: profile.photos[0].value
+            });
 
-        let usuarioService = new UsuarioService();
+            result = <any>await usuarioService.findByEmail(email);
+        }
+        const user = result.dataValues;
+
 
         /*
-        Supongo que el createUser ya controla si este usuario ya existe
-        ahora no sé si en Spring tenemos puesto unique hay que mirarlo
-        */
+        * Sacamos el modo de inicio de sesion
+        * Solo dejamos logear si en modo de inicio de sesion es google
+        * */
+        const authMode = ModoInicioSesion[user.modo_inicio_sesion];
 
-        /*
-        No lo he mirado mucho pero diria que la fecha de nacimiento, el genero
-        y la dirección no podemos obtenerla. Deberemos completarla en el
-        panel de editar el perfil.
-        */
-
-        await usuarioService.createUser({
-            idusuario: undefined,
-            email: profile.emails[0].value,
-            contraseña: null,
-            nombre: profile.name.givenName,
-            apellidos: profile.name.familyName,
-            direccion: null,
-            genero: 0,
-            dataNacimiento: "2005-00-00",
-            rol: 0,
-            modo_inicio_sesion: 0,
-            foto_perfil: profile.photos[0].value
-        });
-
-        return done(null, profile.emails[0].value);
-
+        if (authMode.toLowerCase() !== 'google') {
+            return done(null, false); // Enviar al cb de failure
+        } else {
+            return done(null, user.email);
+        }
     }
 ));
 
