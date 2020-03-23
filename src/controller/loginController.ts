@@ -1,15 +1,13 @@
 import {OK, BAD_REQUEST, UNAUTHORIZED} from 'http-status-codes';
 import {Controller, Middleware, Get, Post} from '@overnightjs/core';
 import {Request, Response} from 'express';
+
+import {Usuario} from "../model/Usuario";
 import {UsuarioService} from "../service/usuarioService";
+
 import * as jwt from "jsonwebtoken";
 import * as passport from "passport";
-
-/*
-* Esto nos permitira crear tokens sin tener que hacerlo aqui en el codigo a pelo !
-* */
-import {TokenService} from "../service/TokenService";
-import {ModoInicioSesion} from "../model/enum/ModoInicioSesion";
+import * as bcrypt from "bcrypt";
 
 require('../config/enviroment');
 require('../config/passport');
@@ -24,9 +22,7 @@ export class LoginController {
     }
 
     @Get('google/callback')
-    @Middleware(passport.authenticate('google', {
-        failureRedirect: '/auth/google/failure'
-    }))
+    @Middleware(passport.authenticate('google'))
     private loginGoogleCallBack(req: Request, res: Response) {
 
         // Demomento solo guardamos el correo en el token

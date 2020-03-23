@@ -49,10 +49,10 @@ export class Usuario extends Model<Usuario> {
 
     @Column({
         field: 'genero',
-        type: 'string'
+        type: DataType.NUMBER
 
     })
-    genero: string | undefined;
+    genero: number | undefined;
 
     @Column({
         field: 'data_nacimiento',
@@ -63,10 +63,10 @@ export class Usuario extends Model<Usuario> {
 
     @Column({
         field: 'rol',
-        type: 'string'
+        type: DataType.NUMBER
 
     })
-    rol: string | undefined;
+    rol: number | undefined;
 
     @Column({
         field: 'modo_inicio_sesion',
