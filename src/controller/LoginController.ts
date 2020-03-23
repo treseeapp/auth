@@ -71,7 +71,7 @@ export class LoginController {
                 * */
                 if (!usuario) {
                     res.status(UNAUTHORIZED).statusMessage = 'Datos de login no validos';
-                    return res.end()
+                    return res.end();
                 }
 
                 /*
@@ -103,7 +103,7 @@ export class LoginController {
         const result = <any>await this.usuarioService.findByEmail(email);
 
         if (result !== null) {
-            return res.status(BAD_REQUEST).statusMessage = "Este correo ya existe"
+            return res.status(BAD_REQUEST).statusMessage = "Este correo ya existe";
         }
 
         let genero;
@@ -139,11 +139,11 @@ export class LoginController {
                 foto_perfil: ''
             });
 
-            return res.status(OK).statusMessage = "Usuario creado"
+            return res.status(OK).statusMessage = "Usuario creado";
 
         } else {
             console.log("Hay cambios que faltan");
-            return res.status(BAD_REQUEST).statusMessage = "Faltan datos del usuario"
+            return res.status(BAD_REQUEST).statusMessage = "Faltan datos del usuario";
         }
     }
 
@@ -163,7 +163,7 @@ export class LoginController {
         const validate = this.tokenService.validateToken(refreshToken);
 
         if (validate == false) {
-            return res.status(UNAUTHORIZED).statusMessage = "TOKEN NO VALIDO"
+            return res.status(UNAUTHORIZED).statusMessage = "TOKEN NO VALIDO";
         }
 
         const usuario = this.tokenService.getUser(refreshToken);
@@ -177,6 +177,6 @@ export class LoginController {
         res.status(OK).json({
             accessToken: newAccesToken,
             refreshToken: newRefreshToken
-        })
+        });
     }
 }
