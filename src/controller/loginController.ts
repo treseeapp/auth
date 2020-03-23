@@ -6,6 +6,9 @@ import {UsuarioService} from "../service/usuarioService";
 
 import * as jwt from "jsonwebtoken";
 import * as passport from "passport";
+import {ModoInicioSesion} from "../model/enum/ModoInicioSesion";
+import {Genero} from "../model/enum/Genero";
+import {Rol} from "../model/enum/Rol";
 
 require('../config/enviroment');
 require('../config/passport');
@@ -84,7 +87,7 @@ export class LoginController {
 
         console.log("Entra en el controller de login");
 
-        passport.authenticate('local', async function (err: any, info: string)  {
+        passport.authenticate('local', async function (err: any, info: string) {
 
             /*
 
@@ -139,6 +142,14 @@ export class LoginController {
             foto_perfil = req.body.foto_perfil;
         }
 
+        let genero;
+
+        if (req.body.genero == "Hombre") {
+            genero = Genero.HOMBRE;
+        } else {
+            genero = Genero.MUJER;
+        }
+
         let usuarioService = new UsuarioService();
 
         /*
@@ -153,10 +164,9 @@ export class LoginController {
         no controlaramos el cliente habría que hacerlo.*/
 
         /*
-        Hay que discutir si enviamo ya directamente desde el cliente el rol correctamente
-        o lo modificamos aquí, tambíen hay que crear el enum del modo_inicio_sesion */
-
-        console.log(req.body.nombre);
+        Hay que discutir si enviamos ya directamente desde el cliente el rol correctamente
+        o lo modificamos aquí, como siempre por lo que comentamos seran estudiantes le pongo estudiante
+         por defecto */
 
         await usuarioService.createUser({
             idusuario: undefined,
@@ -165,10 +175,10 @@ export class LoginController {
             nombre: req.body.nombre,
             apellidos: req.body.apellidos,
             direccion: req.body.direccion,
-            genero: 0,
-            dataNacimiento: "2005-00-00",
-            rol: 0,
-            modo_inicio_sesion: 0,
+            genero: genero,
+            dataNacimiento: req.body.dataNacimiento,
+            rol: Rol.ESTUDIANTE,
+            modo_inicio_sesion: ModoInicioSesion.LOCAL,
             foto_perfil: foto_perfil
         });
 
@@ -176,7 +186,6 @@ export class LoginController {
             message: "Todo OK"
         });
 
-        // Si hay error de lo comenado hay que enviar error
-
+        // Si hay error de lo comentado hay que enviar error
     }
 }
