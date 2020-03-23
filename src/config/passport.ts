@@ -1,11 +1,12 @@
-import {Usuario} from "../model/Usuario";
-import {UsuarioService} from "../service/usuarioService";
+import {UsuarioService} from "../service/UsuarioService";
 import {ModoInicioSesion} from "../model/enum/ModoInicioSesion";
+import * as passport from "passport";
+import * as passportGoogle from 'passport-google-oauth2';
+import * as localPassport from "passport-local";
 
-let passport = require('passport');
-let GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
-let LocalStrategy = require('passport-local').Strategy;
 
+const GoogleStrategy = passportGoogle.Strategy;
+const LocalStrategy = localPassport.Strategy;
 require('./enviroment');
 
 passport.serializeUser(function (user: any, done: any) {
@@ -16,34 +17,40 @@ passport.deserializeUser(function (obj: any, done: any) {
     done(null, obj);
 });
 
-passport.use(new GoogleStrategy({
-        clientID: process.env.GOOGLE_CLIENT_ID,
-        clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-        callbackURL: process.env.GOOGLE_CALLBACK_URL,
-    },
-    async function (accesToken: string, refreshToken: string, profile: any, done: any) {
 
+/*
+* Implementacion de las estrategias
+* */
+passport.use(new GoogleStrategy(
+    {
+        clientID: process.env.GOOGLE_CLIENT_ID || '',
+        clientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
+        callbackURL: process.env.GOOGLE_CALLBACK_URL || '',
+        passReqToCallback: true
+    },
+    async function (request: any, accessToken: string, refreshToken: string, profile: any, done: any) {
         const usuarioService = new UsuarioService();
-        const email = profile.emails[0].value;
+        const email = profile.email;
         let result;
 
-        console.log(profile)
+        console.log(profile);
+
+        console.log(profile);
         result = <any>await usuarioService.findByEmail(email);
 
 
-        if (result ===  null){
+        if (result === null) {
             /*
             * Usuario no existe
             * */
             await usuarioService.createUser({
-                idusuario: undefined,
                 email: profile.emails[0].value,
-                contraseña: null,
-                nombre: profile.name.givenName,
-                apellidos: profile.name.familyName,
+                contraseña: '',
+                nombre: profile.givenName,
+                apellidos: profile.familyName,
                 direccion: null,
-                genero: null,
-                dataNacimiento: null,
+                genero: 0,
+                dataNacimiento: '2000-01-01',
                 rol: 1,
                 modo_inicio_sesion: 0,
                 foto_perfil: profile.photos[0].value
@@ -63,44 +70,39 @@ passport.use(new GoogleStrategy({
         if (authMode.toLowerCase() !== 'google') {
             return done(null, false); // Enviar al cb de failure
         } else {
-            return done(null, user.email);
+            return done(null, user);
         }
     }
 ));
 
 passport.use(new LocalStrategy({
-        usernameField: 'email',
-        passwordField: 'password',
-        passReqToCallback: true,
-    },
-    async function (req: any, email: string, password: string, done: any, error: any) {
+    usernameField: 'email',
+    passwordField: 'password',
+    passReqToCallback: true
+}, async function (req, email, password, cb) {
 
-        console.log("Probando");
+    console.log("Mi req: ", req.body);
 
-        /*        console.log("Tiene que llegar al local");
-                console.log(email);
-                console.log(password);
+    /*
+    * Validar usuario
+    * */
+    const service = new UsuarioService();
+    const userToValidate = {
+        email: req.body.email,
+        contraseña: req.body.password,
+    };
 
-                const service = new UsuarioService();
+    const result = await service.validateUserLocal(userToValidate);
 
-                // Falta añadir el authMode lo comentamos
-                const userToValidate = {
-                    email: email,
-                    contraseña: password,
-                };
-
-                const result = await service.validateUser(userToValidate);
-
-                console.log("Esto el resultado del validateUser= " + result);
-
-                let userValidated;
-
-                if (result) {
-                    userValidated = await service.findByEmail(userToValidate.email);
-                } else {
-                    userValidated = false;
-                }
-
-                return done(null, userValidated);*/
+    let userValidated;
+    if (result) {
+        userValidated = await service.findByEmail(userToValidate.email);
+    } else {
+        userValidated = false;
     }
-));
+
+    return cb(null, userValidated);
+}));
+
+
+
