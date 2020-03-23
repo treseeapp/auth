@@ -148,7 +148,7 @@ export class LoginController {
     }
 
     @Post('/auth/refresh/token')
-    private async refreshToken(req: Request, res: Response) {
+    private async newToken(req: Request, res: Response) {
 
         const refreshToken = req.body.refreshToken;
 

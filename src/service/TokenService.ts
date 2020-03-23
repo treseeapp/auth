@@ -33,7 +33,7 @@ export class TokenService {
 
         let decoded: any = jwt.verify(refreshToken, <string>process.env.TOKEN_SECRET_KEY);
 
-        console.log(decoded.user);
+        console.log(decoded);
         return decoded.user;
 
     }
