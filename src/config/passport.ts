@@ -22,43 +22,47 @@ passport.use(new GoogleStrategy({
         callbackURL: process.env.GOOGLE_CALLBACK_URL,
     },
     async function (accesToken: string, refreshToken: string, profile: any, done: any) {
+        const usuarioService = new UsuarioService();
+        const email = profile.emails[0].value;
+        let result;
 
-    /*
-    Podemos obtener también el cumpleaños y la dirección si no voy mal
-    pero podemos decirir si no rellena el usuario o obtenemos estos
-    valores de Google. Si decidimos que se diten del panel del perfil
-     hay que hacer estos valores nullable */
+        console.log(profile)
+        result = <any>await usuarioService.findByEmail(email);
 
-        console.log("Llega aquiii");
+        if (result ===  null){
+            /*
+            * Usuario no existe
+            * */
+            await usuarioService.createUser({
+                idusuario: undefined,
+                email: profile.emails[0].value,
+                contraseña: null,
+                nombre: profile.name.givenName,
+                apellidos: profile.name.familyName,
+                direccion: null,
+                genero: null,
+                dataNacimiento: null,
+                rol: 1,
+                modo_inicio_sesion: 0,
+                foto_perfil: profile.photos[0].value
+            });
 
-        console.log(profile);
-        console.log(profile.emails[0].value);
+            result = <any>await usuarioService.findByEmail(email);
+        }
+        const user = result.dataValues;
 
-        let usuarioService = new UsuarioService();
 
         /*
-        Supongo que el createUser ya controla si este usuario ya existe
-        ahora no sé si en Spring tenemos puesto unique hay que mirarlo
-        he visto que no lo controla deberiamos comprobar si existe y
-        luego si no existe hacer el create
-        */
+        * Sacamos el modo de inicio de sesion
+        * Solo dejamos logear si en modo de inicio de sesion es google
+        * */
+        const authMode = ModoInicioSesion[user.modo_inicio_sesion];
 
-        await usuarioService.createUser({
-            idusuario: undefined,
-            email: profile.emails[0].value,
-            contraseña: null,
-            nombre: profile.name.givenName,
-            apellidos: profile.name.familyName,
-            direccion: null,
-            genero: 0,
-            dataNacimiento: "2005-00-00",
-            rol: 0,
-            modo_inicio_sesion: ModoInicioSesion.GOOGLE,
-            foto_perfil: profile.photos[0].value
-        });
-
-        return done(null, profile.emails[0].value);
-
+        if (authMode.toLowerCase() !== 'google') {
+            return done(null, false); // Enviar al cb de failure
+        } else {
+            return done(null, user.email);
+        }
     }
 ));
 
