@@ -101,13 +101,17 @@ export class LoginController {
         * */
         const email = req.body.email;
         const result = <any>await this.usuarioService.findByEmail(email);
-
         if (result !== null) {
-            return res.status(BAD_REQUEST).statusMessage = "Este correo ya existe";
+            res.status(BAD_REQUEST).statusMessage = 'Email ya en uso';
+            return res.end();
         }
+
 
         let genero;
 
+        /*
+        * Miramos que recibimos los campos obligtorios desde el cliente
+        * */
         if (req.body.email !== "" && req.body.email !== null && req.body.email !== undefined &&
             req.body.contraseña !== "" && req.body.contraseña !== null && req.body.contraseña !== undefined &&
             req.body.nombre !== "" && req.body.nombre !== null && req.body.nombre !== undefined &&
@@ -118,8 +122,9 @@ export class LoginController {
 
             // TODO discutir unas cosas
 
-            let direccion;
+            let direccion = null;
             if (req.body.direccion!='') direccion=req.body.direccion;
+
 
             /*
             *  Creamos el usuario
@@ -136,11 +141,11 @@ export class LoginController {
                 modo_inicio_sesion: ModoInicioSesion.LOCAL,
             });
 
-            return res.status(OK).statusMessage = "Usuario creado";
-
+            return res.status(OK).end();
         } else {
             console.log("Hay cambios que faltan");
-            return res.status(BAD_REQUEST).statusMessage = "Faltan datos requeridos del usuario";
+            res.status(BAD_REQUEST).statusMessage = "Faltan datos requeridos del usuario";
+            return res.end();
         }
     }
 
