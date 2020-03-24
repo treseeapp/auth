@@ -14,22 +14,17 @@ export class TokenService {
     validateToken(refreshToken: any) {
 
         try {
-            console.log("Validamos el token");
-            jwt.verify(refreshToken, <string>process.env.TOKEN_SECRET_KEY);
-            console.log("El token valida");
+            jwt.verify(refreshToken, <string>process.env.JWT_SECRET);
             return true;
-
         } catch (e) {
-            console.log("El token no es válido");
             return false;
         }
     }
 
-    getUser(refreshToken: any) {
+    getEmail(refreshToken: any) {
 
-        let decoded: any = jwt.verify(refreshToken, <string>process.env.TOKEN_SECRET_KEY);
-        console.log(decoded);
-        return decoded.user;
+        let decoded: any = jwt.verify(refreshToken, <string>process.env.JWT_SECRET);
+        return decoded.email;
 
     }
 }

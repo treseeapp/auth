@@ -33,6 +33,7 @@ export class LoginController {
         failureRedirect: '/auth/google/failure'
     }))
     private loginGoogleCallBack(req: Request, res: Response) {
+
         const usuario = <any>req.user;
 
         const accessToken = this.tokenService.tokenGenerator(usuario);
@@ -77,6 +78,7 @@ export class LoginController {
                 *
                 * La passwd nucna va al token, por eso en el token generator la quitamos
                 * */
+
                 const token = this.tokenService.tokenGenerator(usuario.dataValues);
                 const refresh_token = this.tokenService.tokenGenerator(usuario.dataValues, process.env.REFRESH_TOKEN_EXPIRE);
                 const rol = Rol[usuario.rol];
@@ -141,7 +143,6 @@ export class LoginController {
 
             return res.status(OK).end();
         } else {
-            console.log("Hay cambios que faltan");
             res.status(BAD_REQUEST).statusMessage = "Faltan datos requeridos del usuario";
             return res.end();
         }
@@ -150,9 +151,8 @@ export class LoginController {
     @Post('refresh/token')
     private async newToken(req: Request, res: Response) {
 
-        // TODO COMPROBAR QUE FUNCIONA CUANDO PODAMOS HACER PETICIONES
-
         const refreshToken = <string>req.header("Authorization");
+
         if (!refreshToken && refreshToken === '') {
             res.status(BAD_REQUEST).statusMessage = "Refresh token no recibido";
             return res.end();
@@ -163,7 +163,6 @@ export class LoginController {
         *
         * 401  + mensaje
         * */
-
         const validate = this.tokenService.validateToken(refreshToken);
 
         if (validate == false) {
@@ -171,10 +170,16 @@ export class LoginController {
             return res.end();
         }
 
-        const usuario = this.tokenService.getUser(refreshToken);
+        /*
+        * Si el refreshToken es válido
+        *
+        * Creamos un acces y un refresh token nuevos
+        * */
+        const email = this.tokenService.getEmail(refreshToken);
+        const usuario = <any>await this.usuarioService.findByEmail(email);
 
-        const newAccesToken = this.tokenService.tokenGenerator(usuario);
-        const newRefreshToken = this.tokenService.tokenGenerator(usuario, process.env.REFRESH_TOKEN_EXPIRE);
+        const newAccesToken = this.tokenService.tokenGenerator(usuario.dataValues);
+        const newRefreshToken = this.tokenService.tokenGenerator(usuario.dataValues, process.env.REFRESH_TOKEN_EXPIRE);
 
         /*
         * Enviamos el response al cliente
