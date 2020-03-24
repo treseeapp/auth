@@ -28,7 +28,6 @@ export class LoginController {
         res.end();
     }
 
-
     @Get('google/callback')
     @Middleware(passport.authenticate('google', {
         failureRedirect: '/auth/google/failure'
@@ -48,7 +47,6 @@ export class LoginController {
     private loginGoogleCallBackFailure(req: Request, res: Response) {
         res.redirect(301, process.env.FRONTEND_URL + '/#/login/');
     }
-
 
     @Post('login')
     private async loginLocal(req: Request, res: Response) {
@@ -100,43 +98,43 @@ export class LoginController {
         * Si existe, mandamos un 400 + mensaje 'Este correo ya existe'
         * */
         const email = req.body.email;
+        const contraseña = req.body.contraseña;
+        const nombre = req.body.nombre;
+        const apellidos = req.body.apellidos;
+        const dataNacimiento = req.body.dataNacimiento;
+
         const result = <any>await this.usuarioService.findByEmail(email);
         if (result !== null) {
             res.status(BAD_REQUEST).statusMessage = 'Email ya en uso';
             return res.end();
         }
 
-
-        let genero;
-
         /*
         * Miramos que recibimos los campos obligtorios desde el cliente
         * */
-        if (req.body.email !== "" && req.body.email !== null && req.body.email !== undefined &&
-            req.body.contraseña !== "" && req.body.contraseña !== null && req.body.contraseña !== undefined &&
-            req.body.nombre !== "" && req.body.nombre !== null && req.body.nombre !== undefined &&
-            req.body.apellidos !== "" && req.body.apellidos !== null && req.body.apellidos !== undefined) {
+        if (email !== "" && email !== null && email !== undefined &&
+            contraseña !== "" && contraseña !== null && contraseña !== undefined &&
+            nombre !== "" && nombre !== null && nombre !== undefined &&
+            apellidos !== "" && apellidos !== null && apellidos !== undefined) {
 
+            let genero = null;
             if (req.body.genero == "Hombre") genero = Genero.HOMBRE;
             if (req.body.genero == "Mujer") genero = Genero.MUJER;
 
-            // TODO discutir unas cosas
-
             let direccion = null;
-            if (req.body.direccion!='') direccion=req.body.direccion;
-
+            if (req.body.direccion != '') direccion = req.body.direccion;
 
             /*
             *  Creamos el usuario
             * */
             await this.usuarioService.createUser({
-                email: req.body.email,
-                contraseña: req.body.contraseña,
-                nombre: req.body.nombre,
-                apellidos: req.body.apellidos,
+                email: email,
+                contraseña: contraseña,
+                nombre: nombre,
+                apellidos: apellidos,
                 direccion: direccion,
                 genero: genero,
-                dataNacimiento: req.body.dataNacimiento,
+                dataNacimiento: dataNacimiento,
                 rol: Rol.ESTUDIANTE,
                 modo_inicio_sesion: ModoInicioSesion.LOCAL,
             });
@@ -159,10 +157,6 @@ export class LoginController {
             res.status(BAD_REQUEST).statusMessage = "Refresh token no recibido";
             return res.end();
         }
-
-        // TODO BORRAR COMENTS
-        // No viene en el body, viene en el header, ya que en los interceptors de axios lo acabamos poniendo ahi si te acuerdas
-        // const refreshToken = req.body.refreshToken;
 
         /*
         * Primer paso ! Validamos refresh token
