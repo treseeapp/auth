@@ -101,13 +101,19 @@ export class LoginController {
         * */
         const email = req.body.email;
         const contraseña = req.body.contraseña;
+        const contraseña2 = req.body.contraseña2;
         const nombre = req.body.nombre;
         const apellidos = req.body.apellidos;
         const dataNacimiento = req.body.dataNacimiento;
+        const generoRecibido = <string>req.body.genero
 
         const result = <any>await this.usuarioService.findByEmail(email);
         if (result !== null) {
             res.status(BAD_REQUEST).statusMessage = 'Email ya en uso';
+            return res.end();
+        }
+        if (contraseña !== contraseña2) {
+            res.status(BAD_REQUEST).statusMessage = 'Las contraseñas no coinciden';
             return res.end();
         }
 
@@ -116,12 +122,13 @@ export class LoginController {
         * */
         if (email !== "" && email !== null && email !== undefined &&
             contraseña !== "" && contraseña !== null && contraseña !== undefined &&
+            contraseña2 !== "" && contraseña2 !== null && contraseña2 !== undefined &&
             nombre !== "" && nombre !== null && nombre !== undefined &&
             apellidos !== "" && apellidos !== null && apellidos !== undefined) {
 
             let genero = null;
-            if (req.body.genero == "Hombre") genero = Genero.HOMBRE;
-            if (req.body.genero == "Mujer") genero = Genero.MUJER;
+            if (generoRecibido.toLowerCase() == "hombre") genero = Genero.HOMBRE;
+            if (generoRecibido.toLowerCase() == "mujer") genero = Genero.MUJER;
 
             let direccion = null;
             if (req.body.direccion != '') direccion = req.body.direccion;
@@ -165,7 +172,7 @@ export class LoginController {
         * */
         const validate = this.tokenService.validateToken(refreshToken);
 
-        if (validate == false) {
+        if (!validate) {
             res.status(UNAUTHORIZED).statusMessage = "TOKEN NO VALIDO";
             return res.end();
         }
