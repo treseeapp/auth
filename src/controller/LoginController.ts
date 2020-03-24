@@ -152,7 +152,15 @@ export class LoginController {
 
         // TODO COMPROBAR QUE FUNCIONA CUANDO PODAMOS HACER PETICIONES
 
-        const refreshToken = req.body.refreshToken;
+        const refreshToken = <string>req.header("Authorization");
+        if (!refreshToken && refreshToken === '') {
+            res.status(BAD_REQUEST).statusMessage = "Refresh token no recibido";
+            return res.end();
+        }
+
+        // TODO BORRAR COMENTS
+        // No viene en el body, viene en el header, ya que en los interceptors de axios lo acabamos poniendo ahi si te acuerdas
+        // const refreshToken = req.body.refreshToken;
 
         /*
         * Primer paso ! Validamos refresh token
