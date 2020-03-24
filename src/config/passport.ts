@@ -4,7 +4,6 @@ import * as passport from "passport";
 import * as passportGoogle from 'passport-google-oauth2';
 import * as localPassport from "passport-local";
 import {Rol} from "../model/enum/Rol";
-import {Genero} from "../model/enum/Genero";
 
 
 const GoogleStrategy = passportGoogle.Strategy;
@@ -48,9 +47,6 @@ passport.use(new GoogleStrategy(
                 contraseña: '',
                 nombre: profile.given_name,
                 apellidos: profile.family_name,
-                direccion: '',
-                genero: Genero.INDEFINIDO,
-                dataNacimiento: '0000-00-00',
                 rol: Rol.ESTUDIANTE,
                 modo_inicio_sesion: ModoInicioSesion.GOOGLE,
                 foto_perfil: profile.photos[0].value

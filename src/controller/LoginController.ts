@@ -111,17 +111,10 @@ export class LoginController {
         if (req.body.email !== "" && req.body.email !== null && req.body.email !== undefined &&
             req.body.contraseña !== "" && req.body.contraseña !== null && req.body.contraseña !== undefined &&
             req.body.nombre !== "" && req.body.nombre !== null && req.body.nombre !== undefined &&
-            req.body.apellidos !== "" && req.body.apellidos !== null && req.body.apellidos !== undefined &&
-            req.body.direccion !== "" && req.body.direccion !== null && req.body.direccion !== undefined &&
-            req.body.dataNacimiento !== "" && req.body.dataNacimiento !== null && req.body.dataNacimiento !== undefined &&
-            req.body.genero !== "" && req.body.genero !== null && req.body.genero !== undefined) {
+            req.body.apellidos !== "" && req.body.apellidos !== null && req.body.apellidos !== undefined) {
 
-            if (req.body.genero == "Hombre") {
-                genero = Genero.HOMBRE;
-
-            } else {
-                genero = Genero.MUJER;
-            }
+            if (req.body.genero == "Hombre") genero = Genero.HOMBRE;
+            if (req.body.genero =="Mujer") genero = Genero.MUJER;
 
             /*
             *  Creamos el usuario
@@ -136,14 +129,13 @@ export class LoginController {
                 dataNacimiento: req.body.dataNacimiento,
                 rol: Rol.ESTUDIANTE,
                 modo_inicio_sesion: ModoInicioSesion.LOCAL,
-                foto_perfil: ''
             });
 
             return res.status(OK).statusMessage = "Usuario creado";
 
         } else {
             console.log("Hay cambios que faltan");
-            return res.status(BAD_REQUEST).statusMessage = "Faltan datos del usuario";
+            return res.status(BAD_REQUEST).statusMessage = "Faltan datos requeridos del usuario";
         }
     }
 

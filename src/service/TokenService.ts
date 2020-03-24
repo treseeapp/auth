@@ -14,13 +14,9 @@ export class TokenService {
     validateToken(refreshToken: any) {
 
         try {
-
             console.log("Validamos el token");
-
             jwt.verify(refreshToken, <string>process.env.TOKEN_SECRET_KEY);
-
             console.log("El token valida");
-
             return true;
 
         } catch (e) {
@@ -32,7 +28,6 @@ export class TokenService {
     getUser(refreshToken: any) {
 
         let decoded: any = jwt.verify(refreshToken, <string>process.env.TOKEN_SECRET_KEY);
-
         console.log(decoded);
         return decoded.user;
 
