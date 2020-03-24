@@ -82,8 +82,8 @@ export class LoginController {
                 const rol = Rol[usuario.rol];
 
                 return res.status(OK).json({
-                    access_token: token,
-                    refresh_token: refresh_token,
+                    accesToken: token,
+                    refreshToken: refresh_token,
                     rol: rol
                 })
 
