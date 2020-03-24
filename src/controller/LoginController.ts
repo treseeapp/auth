@@ -168,7 +168,8 @@ export class LoginController {
         const validate = this.tokenService.validateToken(refreshToken);
 
         if (validate == false) {
-            return res.status(UNAUTHORIZED).statusMessage = "TOKEN NO VALIDO";
+            res.status(UNAUTHORIZED).statusMessage = "TOKEN NO VALIDO";
+            return res.end();
         }
 
         const usuario = this.tokenService.getUser(refreshToken);
