@@ -114,7 +114,12 @@ export class LoginController {
             req.body.apellidos !== "" && req.body.apellidos !== null && req.body.apellidos !== undefined) {
 
             if (req.body.genero == "Hombre") genero = Genero.HOMBRE;
-            if (req.body.genero =="Mujer") genero = Genero.MUJER;
+            if (req.body.genero == "Mujer") genero = Genero.MUJER;
+
+            // TODO discutir unas cosas
+
+            let direccion;
+            if (req.body.direccion!='') direccion=req.body.direccion;
 
             /*
             *  Creamos el usuario
@@ -124,7 +129,7 @@ export class LoginController {
                 contraseña: req.body.contraseña,
                 nombre: req.body.nombre,
                 apellidos: req.body.apellidos,
-                direccion: req.body.direccion,
+                direccion: direccion,
                 genero: genero,
                 dataNacimiento: req.body.dataNacimiento,
                 rol: Rol.ESTUDIANTE,
