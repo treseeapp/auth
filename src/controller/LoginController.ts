@@ -106,13 +106,13 @@ export class LoginController {
             return res.status(BAD_REQUEST).statusMessage = "Este correo ya existe";
         }
 
-        let genero;
 
         if (req.body.email !== "" && req.body.email !== null && req.body.email !== undefined &&
             req.body.contraseña !== "" && req.body.contraseña !== null && req.body.contraseña !== undefined &&
             req.body.nombre !== "" && req.body.nombre !== null && req.body.nombre !== undefined &&
             req.body.apellidos !== "" && req.body.apellidos !== null && req.body.apellidos !== undefined) {
 
+            let genero;
             if (req.body.genero == "Hombre") genero = Genero.HOMBRE;
             if (req.body.genero == "Mujer") genero = Genero.MUJER;
 
