@@ -69,7 +69,7 @@ export class LoginController {
                 * TODO cambiar esto por el cb de error que cambiaremos en el passport local
                 * */
                 if (!usuario) {
-                    res.status(UNAUTHORIZED).statusMessage = 'Datos de login no validos';
+                    res.status(UNAUTHORIZED).statusMessage = 'Datos de login no validos.';
                     return res.end();
                 }
 
@@ -99,7 +99,6 @@ export class LoginController {
         * TODO mirar como hacer captcha para registrar usuario
         * */
 
-
         const email = req.body.email;
         const contraseña = req.body.contraseña;
         const contraseña2 = req.body.contraseña2;
@@ -108,14 +107,13 @@ export class LoginController {
         const dataNacimiento = req.body.dataNacimiento;
         const generoRecibido = <string>req.body.genero;
 
-
         const result = <any>await this.usuarioService.findByEmail(email);
 
         /*
         * Comprovamos que el usuario ya no exista
         * */
         if (result !== null) {
-            res.status(BAD_REQUEST).statusMessage = 'Email ya en uso';
+            res.status(BAD_REQUEST).statusMessage = 'Email ya en uso.';
             return res.end();
         }
 
@@ -125,27 +123,31 @@ export class LoginController {
         * · que tenga los caracteres minimos
         * */
         if (contraseña !== contraseña2) {
-            res.status(BAD_REQUEST).statusMessage = 'Las contraseñas no coinciden';
+            res.status(BAD_REQUEST).statusMessage = 'Las contraseñas no coinciden.';
             return res.end();
         }
 
         /*
-        * Comprobar que tiene 8 caracteres
+        * Comprobamos que tiene entre 8 y 20 carácteres, que contiene
+        * almenos una letra mayúscula y almenos un número.
         * */
+
+        if (!/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,20}$/.test(contraseña)) {
+            res.status(BAD_REQUEST).statusMessage = "La contraseña no es válida.";
+            return res.end();
+
+        }
 
         /*
-        * Comprobar que tiene 1 numero
+        * Comprobamos que el correo sea válido con una
+        * expresión regular que contempla el formato básico
+        * de un correo así como también todos los TLD válidos.
         * */
 
-        /*
-        * Comprobar que tiene 1 mayuscula
-        * */
-
-
-        /*
-        * Comprobar que el email que es un email
-        * */
-
+        if (!/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email)) {
+            res.status(BAD_REQUEST).statusMessage = "El email no es válido.";
+            return res.end();
+        }
 
         /*
         * Miramos que recibimos los campos obligtorios desde el cliente
@@ -188,7 +190,7 @@ export class LoginController {
                 rol: rol
             }).end();
         } else {
-            res.status(BAD_REQUEST).statusMessage = "Faltan campos obligatorios";
+            res.status(BAD_REQUEST).statusMessage = "Faltan campos obligatorios.";
             return res.end();
         }
     }
@@ -199,7 +201,7 @@ export class LoginController {
         const refreshToken = <string>req.header("Authorization");
 
         if (!refreshToken && refreshToken === '') {
-            res.status(BAD_REQUEST).statusMessage = "Refresh token no recibido";
+            res.status(BAD_REQUEST).statusMessage = "Refresh token no recibido.";
             return res.end();
         }
 
@@ -211,7 +213,7 @@ export class LoginController {
         const validate = this.tokenService.validateToken(refreshToken);
 
         if (!validate) {
-            res.status(UNAUTHORIZED).statusMessage = "TOKEN NO VALIDO";
+            res.status(UNAUTHORIZED).statusMessage = "Token no valido.";
             return res.end();
         }
 
