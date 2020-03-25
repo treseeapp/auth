@@ -80,12 +80,12 @@ export class LoginController {
                 * */
 
                 const token = this.tokenService.tokenGenerator(usuario.dataValues);
-                const refresh_token = this.tokenService.tokenGenerator(usuario.dataValues, process.env.REFRESH_TOKEN_EXPIRE);
+                const refreshToken = this.tokenService.tokenGenerator(usuario.dataValues, process.env.REFRESH_TOKEN_EXPIRE);
                 const rol = Rol[usuario.rol];
 
                 return res.status(OK).json({
                     accessToken: token,
-                    refreshToken: refresh_token,
+                    refreshToken: refreshToken,
                     rol: rol
                 })
 
@@ -95,23 +95,30 @@ export class LoginController {
     @Post('register')
     private async registerUser(req: Request, res: Response) {
 
-        /*
-        * Comprovamos que el usuario ya no exista
-        * Si existe, mandamos un 400 + mensaje 'Este correo ya existe'
-        * */
         const email = req.body.email;
         const contraseña = req.body.contraseña;
         const contraseña2 = req.body.contraseña2;
         const nombre = req.body.nombre;
         const apellidos = req.body.apellidos;
         const dataNacimiento = req.body.dataNacimiento;
-        const generoRecibido = <string>req.body.genero
+        const generoRecibido = <string>req.body.genero;
+
 
         const result = <any>await this.usuarioService.findByEmail(email);
+
+        /*
+        * Comprovamos que el usuario ya no exista
+        * */
         if (result !== null) {
             res.status(BAD_REQUEST).statusMessage = 'Email ya en uso';
             return res.end();
         }
+
+        /*
+        * Validamos la contrasña
+        * · que coincida (done)
+        * · que tenga los caracteres minimos
+        * */
         if (contraseña !== contraseña2) {
             res.status(BAD_REQUEST).statusMessage = 'Las contraseñas no coinciden';
             return res.end();
@@ -126,12 +133,14 @@ export class LoginController {
             nombre !== "" && nombre !== null && nombre !== undefined &&
             apellidos !== "" && apellidos !== null && apellidos !== undefined) {
 
-            let genero = null;
+            let genero = Genero.INDEFINIDO;
             if (generoRecibido.toLowerCase() == "hombre") genero = Genero.HOMBRE;
-            if (generoRecibido.toLowerCase() == "mujer") genero = Genero.MUJER;
+            else if (generoRecibido.toLowerCase() == "mujer") genero = Genero.MUJER;
 
             let direccion = null;
             if (req.body.direccion != '') direccion = req.body.direccion;
+
+            //const direccion = (req.body.direccion==='')?null:req.body.direccion;
 
             /*
             *  Creamos el usuario
@@ -147,10 +156,19 @@ export class LoginController {
                 rol: Rol.ESTUDIANTE,
                 modo_inicio_sesion: ModoInicioSesion.LOCAL,
             });
+            const userCreated = await this.usuarioService.findByEmail(email);
 
-            return res.status(OK).end();
+            const accessToken = this.tokenService.tokenGenerator(userCreated.dataValues);
+            const refreshToken = this.tokenService.tokenGenerator(userCreated.dataValues, process.env.REFRESH_TOKEN_EXPIRE);
+            const rol = Rol[userCreated.dataValues.rol];
+
+            return res.status(OK).json({
+                accessToken: accessToken,
+                refreshToken: refreshToken,
+                rol: rol
+            }).end();
         } else {
-            res.status(BAD_REQUEST).statusMessage = "Faltan datos requeridos del usuario";
+            res.status(BAD_REQUEST).statusMessage = "Faltan campos obligatorios";
             return res.end();
         }
     }
