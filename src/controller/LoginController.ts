@@ -95,6 +95,11 @@ export class LoginController {
     @Post('register')
     private async registerUser(req: Request, res: Response) {
 
+        /*
+        * TODO mirar como hacer captcha para registrar usuario
+        * */
+
+
         const email = req.body.email;
         const contraseña = req.body.contraseña;
         const contraseña2 = req.body.contraseña2;
@@ -125,6 +130,24 @@ export class LoginController {
         }
 
         /*
+        * Comprobar que tiene 8 caracteres
+        * */
+
+        /*
+        * Comprobar que tiene 1 numero
+        * */
+
+        /*
+        * Comprobar que tiene 1 mayuscula
+        * */
+
+
+        /*
+        * Comprobar que el email que es un email
+        * */
+
+
+        /*
         * Miramos que recibimos los campos obligtorios desde el cliente
         * */
         if (email !== "" && email !== null && email !== undefined &&
@@ -137,10 +160,7 @@ export class LoginController {
             if (generoRecibido.toLowerCase() == "hombre") genero = Genero.HOMBRE;
             else if (generoRecibido.toLowerCase() == "mujer") genero = Genero.MUJER;
 
-            let direccion = null;
-            if (req.body.direccion != '') direccion = req.body.direccion;
-
-            //const direccion = (req.body.direccion==='')?null:req.body.direccion;
+            const direccion = (req.body.direccion === '') ? null : req.body.direccion;
 
             /*
             *  Creamos el usuario
