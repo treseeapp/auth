@@ -1,6 +1,7 @@
 import {UsuarioRepository} from "../repository/UsuarioRepository";
 import * as encriptador from "bcrypt";
 import {ModoInicioSesion} from "../model/enum/ModoInicioSesion";
+
 require('../config/enviroment');
 
 export class UsuarioService {
@@ -32,5 +33,20 @@ export class UsuarioService {
 
         usuario.contraseña = await encriptador.hash(password, saltRounds);
         await this.repo.create(usuario);
+    }
+
+    /*
+    * Este booleano lo que significa es que se ha
+    * modificado la password y antes de hacer el update hay que encriptarla
+    * */
+    async update(usuario: any, encryptPass: boolean = false) {
+        if (encryptPass) {
+            const password = usuario.contraseña;
+            const saltRounds = 10;
+
+            usuario.contraseña = await encriptador.hash(password, saltRounds);
+        }
+
+        await this.repo.update(usuario)
     }
 }

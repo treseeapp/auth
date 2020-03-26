@@ -6,6 +6,7 @@ import * as cors from 'cors';
 import * as passport from "passport";
 
 import {LoginController} from './controller/LoginController';
+import {UsuarioController} from "./controller/UsuarioController";
 
 require('./config/enviroment');
 
@@ -44,7 +45,8 @@ export class Servidor extends Server {
 
     private setupControllers(): void {
         const loginController = new LoginController();
-        super.addControllers([loginController]);
+        const userController = new UsuarioController();
+        super.addControllers([loginController, userController]);
     }
 
     public start(port: number): void {
