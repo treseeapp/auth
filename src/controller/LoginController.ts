@@ -98,7 +98,6 @@ export class LoginController {
         res.redirect(301, process.env.FRONTEND_URL + '/#/login/');
     }
 
-
     /*
     * ------------------
     *
@@ -195,7 +194,6 @@ export class LoginController {
         if (!/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,20}$/.test(contraseña)) {
             res.status(BAD_REQUEST).statusMessage = "La contraseña no es válida.";
             return res.end();
-
         }
 
         /*
