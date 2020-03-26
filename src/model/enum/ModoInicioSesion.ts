@@ -1,5 +1,5 @@
 export enum ModoInicioSesion {
     GOOGLE,
-    FACEBOOK,
-    LOCAL
+    LOCAL,
+    FACEBOOK
 }
