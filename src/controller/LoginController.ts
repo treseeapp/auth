@@ -14,6 +14,9 @@ require('../config/passport');
 @Controller('auth/')
 export class LoginController {
 
+    /*
+    * Variables genericas para toda la clase
+    * */
     private usuarioService: UsuarioService;
     private tokenService: TokenService;
 
@@ -22,15 +25,30 @@ export class LoginController {
         this.tokenService = new TokenService();
     }
 
+    /*
+    * ------------------
+    *
+    *  Endpoints oAuth
+    *
+    * ------------------
+    * */
+
+    /*
+    *Endpoint para hacer oauth con google
+    * */
     @Get('google')
     @Middleware(passport.authenticate('google', {scope: ['profile', 'email', 'https://www.googleapis.com/auth/user.addresses.read', 'https://www.googleapis.com/auth/user.birthday.read']}))
     private loginGoogle(req: Request, res: Response) {
         res.end();
     }
 
+    /*
+    * Endpoint CB si el login de
+    * google ha ido bien la autenticacion
+    * */
     @Get('google/callback')
     @Middleware(passport.authenticate('google', {
-        failureRedirect: '/auth/google/failure'
+        failureRedirect: '/auth/failure'
     }))
     private loginGoogleCallBack(req: Request, res: Response) {
 
@@ -44,20 +62,22 @@ export class LoginController {
         res.redirect(301, process.env.FRONTEND_URL + '/?accessToken=' + accessToken + '&refreshToken=' + refreshToken + '&rol=' + rol + '#/login/callback');
     }
 
-    @Get('google/failure')
-    private loginGoogleCallBackFailure(req: Request, res: Response) {
-        res.redirect(301, process.env.FRONTEND_URL + '/#/login/');
-    }
-
+    /*
+    * Endpoint para comenzar el oAuth con facebook
+    * */
     @Get('facebook')
     @Middleware(passport.authenticate('facebook', {scope: ['email', 'public_profile']}))
     private loginFacebook(req: Request, res: Response) {
         res.end();
     }
 
+    /*
+    * Endpoint CB si el login de
+    * facebook ha ido bien la autenticacion
+    * */
     @Get('facebook/callback')
     @Middleware(passport.authenticate('facebook', {
-        failureRedirect: '/auth/google/failure'
+        failureRedirect: '/auth/failure'
     }))
     private loginFacebookCallBack(req: Request, res: Response) {
 
@@ -70,6 +90,22 @@ export class LoginController {
         res.redirect(301, process.env.FRONTEND_URL + '/?accessToken=' + accessToken + '&refreshToken=' + refreshToken + '&rol=' + rol + '#/login/callback');
     }
 
+    /*
+    * Endpoint de failure para los OAUTH
+    * */
+    @Get('failure')
+    private loginGoogleCallBackFailure(req: Request, res: Response) {
+        res.redirect(301, process.env.FRONTEND_URL + '/#/login/');
+    }
+
+
+    /*
+    * ------------------
+    *
+    *  Endpoint local
+    *
+    * ------------------
+    * */
     @Post('login')
     private async loginLocal(req: Request, res: Response) {
 
@@ -113,6 +149,9 @@ export class LoginController {
             })(req, res);
     }
 
+    /*
+    * Endpoint para poder registrar un usuario
+    * */
     @Post('register')
     private async registerUser(req: Request, res: Response) {
 
@@ -219,6 +258,9 @@ export class LoginController {
         }
     }
 
+    /*
+    * Endpoint para realizar un refresh de tu token
+    * */
     @Post('refresh/token')
     private async newToken(req: Request, res: Response) {
 
