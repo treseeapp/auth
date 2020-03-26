@@ -52,7 +52,8 @@ export class UsuarioController {
 
 
         const email = this.tokenService.getEmail(token);
-        const usuario = <any>await this.usuarioService.findByEmail(email);
+        let usuario = <any>await this.usuarioService.findByEmail(email);
+        usuario = usuario.dataValues;
 
         /*
         * No dejamos cambiar la passwd a un usuario el cual es de oatuh !!!!
@@ -73,6 +74,7 @@ export class UsuarioController {
             return res.end();
         }
         usuario.contraseña = passwords.newPassword;
+
         await this.usuarioService.update(usuario, true);
 
         res.status(OK).end();

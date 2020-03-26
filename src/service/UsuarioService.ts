@@ -40,6 +40,7 @@ export class UsuarioService {
     * modificado la password y antes de hacer el update hay que encriptarla
     * */
     async update(usuario: any, encryptPass: boolean = false) {
+
         if (encryptPass) {
             const password = usuario.contraseña;
             const saltRounds = 10;
