@@ -64,7 +64,7 @@ passport.use(new GoogleStrategy(
         const authMode = ModoInicioSesion[user.modo_inicio_sesion];
 
         if (authMode.toLowerCase() !== 'google') {
-            return done(null, false); // TODO Enviar al cb de failure
+            return done(null, false);
         } else {
             return done(null, user);
         }
@@ -109,12 +109,12 @@ passport.use(new FacebookStrategy({
 
         /*
         * Sacamos el modo de inicio de sesion
-        * Solo dejamos logear si en modo de inicio de sesion es google
+        * Solo dejamos logear si en modo de inicio de sesion es facebook
         * */
         const authMode = ModoInicioSesion[user.modo_inicio_sesion];
 
         if (authMode.toLowerCase() !== 'facebook') {
-            return done(null, false); // TODO Enviar al cb de failure
+            return done(null, false);
         } else {
             return done(null, user);
         }
@@ -143,7 +143,7 @@ passport.use(new LocalStrategy({
     if (result) {
         userValidated = await service.findByEmail(userToValidate.email);
     } else {
-        userValidated = false;
+        userValidated = false; // TODO Enviar al cb de failure
     }
 
     return cb(null, userValidated);
