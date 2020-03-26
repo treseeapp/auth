@@ -49,6 +49,27 @@ export class LoginController {
         res.redirect(301, process.env.FRONTEND_URL + '/#/login/');
     }
 
+    @Get('facebook')
+    @Middleware(passport.authenticate('facebook', {scope: ['email', 'public_profile']}))
+    private loginFacebook(req: Request, res: Response) {
+        res.end();
+    }
+
+    @Get('facebook/callback')
+    @Middleware(passport.authenticate('facebook', {
+        failureRedirect: '/auth/google/failure'
+    }))
+    private loginFacebookCallBack(req: Request, res: Response) {
+
+        const usuario = <any>req.user;
+
+        const accessToken = this.tokenService.tokenGenerator(usuario);
+        const refreshToken = this.tokenService.tokenGenerator(usuario, process.env.REFRESH_TOKEN_EXPIRE);
+        const rol = Rol[usuario.rol];
+        // Habrá que modificar la ruta si es otra más adelante
+        res.redirect(301, process.env.FRONTEND_URL + '/?accessToken=' + accessToken + '&refreshToken=' + refreshToken + '&rol=' + rol + '#/login/callback');
+    }
+
     @Post('login')
     private async loginLocal(req: Request, res: Response) {
 
@@ -178,6 +199,7 @@ export class LoginController {
                 rol: Rol.ESTUDIANTE,
                 modo_inicio_sesion: ModoInicioSesion.LOCAL,
             });
+
             const userCreated = await this.usuarioService.findByEmail(email);
 
             const accessToken = this.tokenService.tokenGenerator(userCreated.dataValues);

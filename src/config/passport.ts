@@ -8,6 +8,7 @@ import {Rol} from "../model/enum/Rol";
 
 const GoogleStrategy = passportGoogle.Strategy;
 const LocalStrategy = localPassport.Strategy;
+const FacebookStrategy = require('passport-facebook').Strategy;
 require('./enviroment');
 
 passport.serializeUser(function (user: any, done: any) {
@@ -32,27 +33,27 @@ passport.use(new GoogleStrategy(
     async function (request: any, accessToken: string, refreshToken: string, profile: any, done: any) {
         const usuarioService = new UsuarioService();
 
-        const email = profile.email;
+        const emailGoogle = profile.email;
 
         let result;
 
-        result = <any>await usuarioService.findByEmail(email);
+        result = <any>await usuarioService.findByEmail(emailGoogle);
 
         if (result === null) {
             /*
             * Usuario no existe
             * */
             await usuarioService.createUser({
-                email: profile.email,
+                email: emailGoogle,
                 contraseña: '',
                 nombre: profile.given_name,
                 apellidos: profile.family_name,
                 rol: Rol.ESTUDIANTE,
                 modo_inicio_sesion: ModoInicioSesion.GOOGLE,
-                foto_perfil: profile.photos[0].value
+                foto_perfil: process.env.IMAGE_PROFILE_DEFAULT
             });
 
-            result = <any>await usuarioService.findByEmail(email);
+            result = <any>await usuarioService.findByEmail(emailGoogle);
         }
         const user = result.dataValues;
 
@@ -69,6 +70,55 @@ passport.use(new GoogleStrategy(
         }
     }
 ));
+
+passport.use(new FacebookStrategy({
+        clientID: process.env.FACEBOOK_APP_ID,
+        clientSecret: process.env.FACEBOOK_APP_SECRET,
+        callbackURL: process.env.FACEBOOK_CALLBACK_URL,
+        profileFields: ['id', 'displayName', 'email', 'first_name', 'middle_name', 'last_name']
+    },
+    async function (accessToken: string, refreshToken: string, id: any, profile: any, done: any) {
+
+        console.log("Lleva al callback de facebook");
+
+        const usuarioService = new UsuarioService();
+        const emailFacebook = profile.emails[0].value;
+        console.log(emailFacebook);
+
+        let result;
+
+        result = <any>await usuarioService.findByEmail(emailFacebook);
+
+        if (result === null) {
+            /*
+            * Usuario no existe
+            * */
+            await usuarioService.createUser({
+                email: emailFacebook,
+                contraseña: '',
+                nombre: profile.name.givenName,
+                apellidos: profile.name.familyName,
+                rol: Rol.ESTUDIANTE,
+                modo_inicio_sesion: ModoInicioSesion.FACEBOOK,
+                foto_perfil: process.env.IMAGE_PROFILE_DEFAULT
+        });
+
+            result = <any>await usuarioService.findByEmail(emailFacebook);
+        }
+        const user = result.dataValues;
+
+        /*
+        * Sacamos el modo de inicio de sesion
+        * Solo dejamos logear si en modo de inicio de sesion es google
+        * */
+        const authMode = ModoInicioSesion[user.modo_inicio_sesion];
+
+        if (authMode.toLowerCase() !== 'facebook') {
+            return done(null, false); // TODO Enviar al cb de failure
+        } else {
+            return done(null, user);
+        }
+    }));
 
 passport.use(new LocalStrategy({
     usernameField: 'email',
