@@ -49,8 +49,7 @@ passport.use(new GoogleStrategy(
                 nombre: profile.given_name,
                 apellidos: profile.family_name,
                 rol: Rol.ESTUDIANTE,
-                modo_inicio_sesion: ModoInicioSesion.GOOGLE,
-                foto_perfil: process.env.IMAGE_PROFILE_DEFAULT
+                modo_inicio_sesion: ModoInicioSesion.GOOGLE
             });
 
             result = <any>await usuarioService.findByEmail(emailGoogle);
@@ -99,8 +98,7 @@ passport.use(new FacebookStrategy({
                 nombre: profile.name.givenName,
                 apellidos: profile.name.familyName,
                 rol: Rol.ESTUDIANTE,
-                modo_inicio_sesion: ModoInicioSesion.FACEBOOK,
-                foto_perfil: process.env.IMAGE_PROFILE_DEFAULT
+                modo_inicio_sesion: ModoInicioSesion.FACEBOOK
         });
 
             result = <any>await usuarioService.findByEmail(emailFacebook);

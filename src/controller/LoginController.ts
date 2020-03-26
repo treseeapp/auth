@@ -237,7 +237,6 @@ export class LoginController {
                 dataNacimiento: dataNacimiento,
                 rol: Rol.ESTUDIANTE,
                 modo_inicio_sesion: ModoInicioSesion.LOCAL,
-                foto_perfil:process.env.IMAGE_PROFILE_DEFAULT
 
             });
 
