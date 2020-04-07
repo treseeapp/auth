@@ -11,9 +11,5 @@ pipelines:
         caches:
           - node
         script: # Modify the commands below to build your repository.
-          - npm install
-          - npm run-script build
-          - echo "$(ls -la dist/)"
-          - scp -r ../ migue@thegrouped.com:/var/www/auth/
-          - ssh migue@thegrouped.com "pwd; cd /var/www/auth/; node dist/App.js; bash"
+          - ssh migue@thegrouped.com "pwd; cd /var/www/auth/auth-backend/; git pull; npm i; npm run-script build; node dist/App.js  "
        
