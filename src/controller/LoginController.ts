@@ -11,7 +11,7 @@ import {Genero} from "../model/enum/Genero";
 require('../config/enviroment');
 require('../config/passport');
 
-@Controller('auth1/')
+@Controller('auth/')
 export class LoginController {
 
     /*
