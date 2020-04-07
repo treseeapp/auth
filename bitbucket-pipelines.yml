@@ -19,6 +19,9 @@ pipelines:
           - npm i
           - npm run-script build
           - ls -la
+          - cd ../
+          - echo "$(ls -la produccion/)"
+          - scp -r produccion/ migue@thegrouped.com:/var/www/prova/
           - ssh migue@thegrouped.com "pwd; cd /var/www/auth/; ./execute.sh " 
     - step:
         script:
