@@ -13,7 +13,7 @@ pipelines:
         script: # Modify the commands below to build your repository.
           - mkdir produccion
           - ls -la
-          - ls -a | grep -v produccion | xargs mv -t produccion
+          - ls | grep -v produccion | xargs mv -t produccion
           - cd produccion
           - ls -la
           - npm i
