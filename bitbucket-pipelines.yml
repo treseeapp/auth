@@ -18,6 +18,7 @@ pipelines:
           - ls -la
           - npm i
           - npm run-script build
+          - rm -rf node_modules
           - ls -la
           - cd ../
           - echo "$(ls -la produccion/)"
