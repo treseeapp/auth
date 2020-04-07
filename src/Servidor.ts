@@ -1,6 +1,5 @@
 import * as bodyParser from 'body-parser';
 import {Server} from '@overnightjs/core';
-import {Logger} from '@overnightjs/logger';
 
 import * as cors from 'cors';
 import * as passport from "passport";
@@ -51,7 +50,6 @@ export class Servidor extends Server {
 
     public start(port: number): void {
         this.app.listen(port, () => {
-            Logger.Imp('Server listening on port: ' + port);
         })
     }
 }
