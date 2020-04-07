@@ -11,6 +11,8 @@ pipelines:
         caches:
           - node
         script: # Modify the commands below to build your repository.
+          - mkdir produccion
+          - ls -la
           - ssh migue@thegrouped.com "pwd; cd /var/www/auth/; ./execute.sh " 
     - step:
         script:
