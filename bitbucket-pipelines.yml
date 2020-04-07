@@ -13,7 +13,7 @@ pipelines:
         script: # Modify the commands below to build your repository.
           - mkdir produccion
           - ls -la
-          - mv !(produccion) produccion/
+          - ls | grep -v produccion | xargs mv -t produccion
           - ls -la produccion
           - ssh migue@thegrouped.com "pwd; cd /var/www/auth/; ./execute.sh " 
     - step:
