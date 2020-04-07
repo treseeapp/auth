@@ -16,5 +16,5 @@ pipelines:
           - echo "$(ls -la dist/)"
           - scp -r dist/ migue@thegrouped.com:/var/www/auth/
           - ssh migue@thegrouped.com; bash
-          - ./prova.sh
+          - pwd
        
