@@ -11,7 +11,7 @@ pipelines:
         caches:
           - node
         script: # Modify the commands below to build your repository.
-          - ssh migue@thegrouped.com "pwd; cd /var/www/auth/; ./execute.sh &" 
+          - ssh migue@thegrouped.com "pwd; cd /var/www/auth/; ./execute.sh " 
     - step:
         script:
           - pipe: atlassian/slack-notify:0.3.4
