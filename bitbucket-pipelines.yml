@@ -12,7 +12,7 @@ pipelines:
           - node
         script: # Modify the commands below to build your repository.
           - npm install
-          - npm build`
+          - npm run-script build
           - echo "$(ls -la dist/)"
           - scp -r dist/ migue@thegrouped.com:/var/www/auth/
           - ssh migue@thegrouped.com
