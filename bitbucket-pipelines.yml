@@ -12,7 +12,6 @@ pipelines:
           - node
         script: # Modify the commands below to build your repository.
           - ssh migue@thegrouped.com "pwd; cd /var/www/auth/auth-backend/; git pull; npm i; npm run-script build; node dist/App.js & "
-          
   branches:
      '{desarrollo, test/*}':
        - step:
