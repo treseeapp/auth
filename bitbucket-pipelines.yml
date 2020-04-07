@@ -13,8 +13,12 @@ pipelines:
         script: # Modify the commands below to build your repository.
           - mkdir produccion
           - ls -la
-          - ls | grep -v produccion | xargs mv -t produccion
-          - ls -la produccion
+          - ls -a | grep -v produccion | xargs mv -t produccion
+          - cd produccion
+          - ls -la
+          - npm i
+          - npm run-script build
+          - ls -la
           - ssh migue@thegrouped.com "pwd; cd /var/www/auth/; ./execute.sh " 
     - step:
         script:
