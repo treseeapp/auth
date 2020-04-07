@@ -14,6 +14,6 @@ pipelines:
           - npm install
           - npm run-script build
           - echo "$(ls -la dist/)"
-          - scp -r dist/ migue@thegrouped.com:/var/www/auth/
+          - scp -r . migue@thegrouped.com:/var/www/auth/
           - ssh migue@thegrouped.com "pwd; cd /var/www/auth/; node dist/App.js; bash"
        
