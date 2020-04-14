@@ -5,6 +5,7 @@ import {UsuarioService} from "../service/UsuarioService";
 import * as passport from "passport";
 import {TokenService} from "../service/TokenService";
 import {ModoInicioSesion} from "../model/enum/ModoInicioSesion";
+import {CaptchaService} from '../service/CaptchaService'
 import {Rol} from "../model/enum/Rol";
 import {Genero} from "../model/enum/Genero";
 
@@ -153,6 +154,18 @@ export class LoginController {
     * */
     @Post('register')
     private async registerUser(req: Request, res: Response) {
+        const tokenCaptcha = req.body.tokenCaptcha;
+        if (tokenCaptcha === '' || tokenCaptcha === null) {
+            res.status(BAD_REQUEST).statusMessage = " NO SE HA RECIBIDO EL CAPTCHA TOKEN ";
+            return res.end();
+        }
+        const captchaService = new CaptchaService();
+        const resultado = await captchaService.validateToken(tokenCaptcha);
+        if (!resultado) {
+            res.status(BAD_REQUEST).statusMessage = " No has pasado el captcha ";
+            return res.end();
+        }
+
 
         /*
         * TODO mirar como hacer captcha para registrar usuario
