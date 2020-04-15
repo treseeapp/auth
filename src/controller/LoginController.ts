@@ -1,5 +1,5 @@
 import {BAD_REQUEST, OK, UNAUTHORIZED} from 'http-status-codes';
-import {Controller, Get, Middleware, Post} from '@overnightjs/core';
+import {Controller, Get, Middleware, Post, Put} from '@overnightjs/core';
 import {Request, Response} from 'express';
 import {UsuarioService} from "../service/UsuarioService";
 import * as passport from "passport";
@@ -8,6 +8,7 @@ import {ModoInicioSesion} from "../model/enum/ModoInicioSesion";
 import {CaptchaService} from '../service/CaptchaService'
 import {Rol} from "../model/enum/Rol";
 import {Genero} from "../model/enum/Genero";
+import * as Mailgun from "mailgun-js";
 
 require('../config/enviroment');
 require('../config/passport');
@@ -311,5 +312,79 @@ export class LoginController {
             accessToken: newAccesToken,
             refreshToken: newRefreshToken
         });
+    }
+
+    @Post('recover/password')
+    private async emailRecoverPassword(req: Request, res: Response) {
+
+        const email = req.body.email;
+        const tokenCaptcha = req.body.tokenCaptcha;
+
+        if (email == '' || email == null || tokenCaptcha == '' || tokenCaptcha == null) {
+            res.status(BAD_REQUEST).statusMessage = "No se han recibido los parametros correctos";
+            return res.end()
+        }
+
+        const captchaService = new CaptchaService();
+        const resultado = await captchaService.validateToken(tokenCaptcha);
+        if (!resultado) {
+            res.status(BAD_REQUEST).statusMessage = " No has pasado el captcha roboto !";
+            return res.end();
+        }
+
+        /*
+        * Comprobamos si el email recibido existe en la bbdd
+        *
+        * No se da ningun error ni nada para que un posible cracker no tenga ningun tipo de informacion
+        * */
+        let usuario = <any>await this.usuarioService.findByEmail(email);
+        if (usuario == null) {
+            return res.end();
+        }
+        usuario = usuario.dataValues;
+
+        /*
+        * Solo se envia un email si el usuario inicia sesion de modo local
+        *
+        * No se da ningun error ni nada para que un posible cracker no tenga ningun tipo de informacion
+        * */
+        if (usuario.modo_inicio_sesion !== ModoInicioSesion.LOCAL) {
+            return res.end();
+        }
+
+        /*
+        * Generamos un token JWT el qual se utilizara para recuperar la contraseña
+        * */
+        const tokensito = this.tokenService.tokenGenerator({
+            email: email
+        }, '12h');
+
+
+        /*
+        * Preparamos el link que nos servira para que se recupere la contraseña
+        * */
+        const linkReset = process.env.FRONTEND_URL + '/?tokenUserModify=' + tokensito;
+        const mailer = new Mailgun({
+            apiKey: process.env.MAILGUN_API_KEY || '',
+            domain: process.env.MAILGUN_DOMAIN || ''
+        });
+        const mensaje = {
+            from: 'no-reply@tresee.app <tresee@' + process.env.MAILGUN_DOMAIN + '>',
+            to: 'Usuario tresee,' + email,
+            subject: 'Hello',
+            template: "recover_password",
+            'h:X-Mailgun-Variables': JSON.stringify({
+                linkButton: linkReset
+            })
+        };
+        const response = await mailer.messages().send(mensaje);
+        console.log(response);
+        res.status(OK);
+        return res.end();
+    }
+
+    @Put('recover/password')
+    private async asignNewPassword(req: Request, res: Response) {
+
     }
 }
