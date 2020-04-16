@@ -9,6 +9,7 @@ export class CaptchaService {
         const URL = process.env.CAPTCHA_URL_VERIFICATION + `?secret=${secret}&response=${token}` || '';
 
         const responseCaptchaValidation = await Axios.default.post(URL);
+
         console.log(responseCaptchaValidation.data);
         return responseCaptchaValidation.data.success == true;
     }
