@@ -325,6 +325,10 @@ export class LoginController {
             return res.end()
         }
 
+
+        /*
+        * Si el captcha no valida, no enviamos email, ya que podria ser un robot
+        * */
         const captchaService = new CaptchaService();
         const resultado = await captchaService.validateToken(tokenCaptcha);
         if (!resultado) {
@@ -363,15 +367,21 @@ export class LoginController {
         /*
         * Preparamos el link que nos servira para que se recupere la contraseña
         * */
+        const domain = process.env.MAILGUN_DOMAIN + '';
+        const api_key = process.env.MAILGUN_API_KEY || '';
+
         const linkReset = process.env.FRONTEND_URL + '/?tokenUserModify=' + tokensito;
         const mailer = new Mailgun({
-            apiKey: process.env.MAILGUN_API_KEY || '',
-            domain: process.env.MAILGUN_DOMAIN || ''
+            apiKey: api_key,
+            domain: domain,
+            host: "api.eu.mailgun.net"
+
         });
+
         const mensaje = {
-            from: 'no-reply@tresee.app <tresee@' + process.env.MAILGUN_DOMAIN + '>',
-            to: 'Usuario tresee,' + email,
-            subject: 'Hello',
+            from: 'no-reply <bot@' + process.env.MAILGUN_DOMAIN + '>',
+            to: 'miguelmonteiroclaveri@gmail.com',
+            subject: 'Recuperacion de contraseña',
             template: "recover_password",
             'h:X-Mailgun-Variables': JSON.stringify({
                 linkButton: linkReset
@@ -383,8 +393,38 @@ export class LoginController {
         return res.end();
     }
 
+
     @Put('recover/password')
     private async asignNewPassword(req: Request, res: Response) {
+        const tokenValidacion = req.body.tokenValidacion;
+        const password1 = req.body.contraseña1;
+        const password2 = req.body.contraseña2;
+        if (this.tokenService.validateToken(tokenValidacion)) {
+            const email = this.tokenService.getEmail(tokenValidacion);
 
+            const usuario = <any>this.usuarioService.findByEmail(email);
+            if (usuario === null) {
+                res.status(BAD_REQUEST).statusMessage = "El usuario del token ya no existe en la BBDD";
+                return res.end();
+            }
+
+            const userToModify = usuario.dataValues;
+
+            /*
+            * TODO VALIDAMOS LAS PASSWORDS
+            * */
+
+
+            userToModify.contraseña = password1;
+            await this.usuarioService.update(userToModify, true);
+
+            res.status(OK);
+            return res.end();
+        }
+        res.status(BAD_REQUEST).statusMessage = "Token no valido";
+        return res.end();
     }
+
+
+
 }
