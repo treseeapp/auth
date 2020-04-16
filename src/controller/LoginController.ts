@@ -1,4 +1,3 @@
-
 import {BAD_REQUEST, OK, UNAUTHORIZED} from 'http-status-codes';
 import {Controller, Get, Middleware, Post, Put} from '@overnightjs/core';
 import {Request, Response} from 'express';
@@ -61,8 +60,9 @@ export class LoginController {
         const refreshToken = this.tokenService.tokenGenerator(usuario, process.env.REFRESH_TOKEN_EXPIRE);
         const rol = Rol[usuario.rol];
 
+        const URL = process.env.FRONTEND_URL + '/?accessToken=' + accessToken + '&refreshToken=' + refreshToken + '&rol=' + rol + '#/login/callback';
         // Habrá que modificar la ruta si es otra más adelante
-        res.redirect(301, process.env.FRONTEND_URL + '/?accessToken=' + accessToken + '&refreshToken=' + refreshToken + '&rol=' + rol + '#/login/callback');
+        res.redirect(301, URL);
     }
 
     /*
@@ -98,7 +98,7 @@ export class LoginController {
     * */
     @Get('failure')
     private loginGoogleCallBackFailure(req: Request, res: Response) {
-        res.redirect(301, process.env.FRONTEND_URL + '/#/login/');
+        res.redirect(301, process.env.FRONTEND_URL + '/#/');
     }
 
     /*
@@ -362,7 +362,7 @@ export class LoginController {
         * */
         const tokensito = this.tokenService.tokenGenerator({
             email: email
-        }, '12h');
+        }, '1h');
 
 
         /*
@@ -376,7 +376,6 @@ export class LoginController {
             apiKey: api_key,
             domain: domain,
             host: "api.eu.mailgun.net"
-
         });
 
         const mensaje = {
@@ -389,7 +388,6 @@ export class LoginController {
             })
         };
         const response = await mailer.messages().send(mensaje);
-        console.log(response);
         res.status(OK);
         return res.end();
     }
@@ -397,26 +395,39 @@ export class LoginController {
 
     @Put('recover/password')
     private async asignNewPassword(req: Request, res: Response) {
-        console.log(req.body);
         const tokenValidacion = req.body.tokenValidacion;
         const password1 = req.body.contraseña1;
         const password2 = req.body.contraseña2;
         if (this.tokenService.validateToken(tokenValidacion)) {
             const email = this.tokenService.getEmail(tokenValidacion);
-            console.log("ESTE ES EL EMAIL:", email);
 
             const usuario = <any>await this.usuarioService.findByEmail(email);
-            console.log(usuario)
             if (usuario === null) {
                 res.status(BAD_REQUEST).statusMessage = "El usuario del token ya no existe en la BBDD";
                 return res.end();
             }
 
             const userToModify = usuario.dataValues;
-            console.log(userToModify)
+
             /*
-            * TODO VALIDAMOS LAS PASSWORDS
+            * Validamos la contrasña
+            * · que coincida (done)
+            * · que tenga los caracteres minimos
             * */
+            if (password1 !== password2) {
+                res.status(BAD_REQUEST).statusMessage = 'Las contraseñas no coinciden.';
+                return res.end();
+            }
+
+            /*
+            * Comprobamos que tiene entre 8 y 20 carácteres, que contiene
+            * almenos una letra mayúscula y almenos un número.
+            * */
+
+            if (!/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,20}$/.test(password1)) {
+                res.status(BAD_REQUEST).statusMessage = "La contraseña no es válida.";
+                return res.end();
+            }
 
 
             userToModify.contraseña = password1;
