@@ -370,7 +370,7 @@ export class LoginController {
         const domain = process.env.MAILGUN_DOMAIN + '';
         const api_key = process.env.MAILGUN_API_KEY || '';
 
-        const linkReset = process.env.FRONTEND_URL + '/?tokenUserModify=' + tokensito;
+        const linkReset = process.env.FRONTEND_URL + '/?tokenUserModify=' + tokensito + '#/change/password';
         const mailer = new Mailgun({
             apiKey: api_key,
             domain: domain,
@@ -379,8 +379,8 @@ export class LoginController {
         });
 
         const mensaje = {
-            from: 'no-reply <bot@' + process.env.MAILGUN_DOMAIN + '>',
-            to: 'miguelmonteiroclaveri@gmail.com',
+            from: 'no-reply <no-reply@' + process.env.MAILGUN_DOMAIN + '>',
+            to: email + '',
             subject: 'Recuperacion de contraseña',
             template: "recover_password",
             'h:X-Mailgun-Variables': JSON.stringify({
@@ -396,20 +396,23 @@ export class LoginController {
 
     @Put('recover/password')
     private async asignNewPassword(req: Request, res: Response) {
+        console.log(req.body);
         const tokenValidacion = req.body.tokenValidacion;
         const password1 = req.body.contraseña1;
         const password2 = req.body.contraseña2;
         if (this.tokenService.validateToken(tokenValidacion)) {
             const email = this.tokenService.getEmail(tokenValidacion);
+            console.log("ESTE ES EL EMAIL:", email);
 
-            const usuario = <any>this.usuarioService.findByEmail(email);
+            const usuario = <any>await this.usuarioService.findByEmail(email);
+            console.log(usuario)
             if (usuario === null) {
                 res.status(BAD_REQUEST).statusMessage = "El usuario del token ya no existe en la BBDD";
                 return res.end();
             }
 
             const userToModify = usuario.dataValues;
-
+            console.log(userToModify)
             /*
             * TODO VALIDAMOS LAS PASSWORDS
             * */
