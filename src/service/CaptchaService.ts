@@ -10,7 +10,7 @@ export class CaptchaService {
 
         const responseCaptchaValidation = await Axios.default.post(URL);
 
-        console.log(responseCaptchaValidation.data);
+        console.log(responseCaptchaValidation);
         return responseCaptchaValidation.data.success == true;
     }
 }
