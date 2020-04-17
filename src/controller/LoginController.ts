@@ -398,6 +398,7 @@ export class LoginController {
         const tokenValidacion = req.body.tokenValidacion;
         const password1 = req.body.contraseña1;
         const password2 = req.body.contraseña2;
+
         if (this.tokenService.validateToken(tokenValidacion)) {
             const email = this.tokenService.getEmail(tokenValidacion);
 
@@ -439,7 +440,4 @@ export class LoginController {
         res.status(BAD_REQUEST).statusMessage = "Token no valido";
         return res.end();
     }
-
-
-
 }
