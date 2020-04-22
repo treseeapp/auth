@@ -60,7 +60,7 @@ export class LoginController {
         const refreshToken = this.tokenService.tokenGenerator(usuario, process.env.REFRESH_TOKEN_EXPIRE);
         const rol = Rol[usuario.rol];
 
-        const URL = process.env.FRONTEND_URL + '/?accessToken=' + accessToken + '&refreshToken=' + refreshToken + '&rol=' + rol + '#/login/callback';
+        const URL = process.env.FRONTEND_URL + '/login/callback?accessToken=' + accessToken + '&refreshToken=' + refreshToken + '&rol=' + rol;
         // Habrá que modificar la ruta si es otra más adelante
         res.redirect(301, URL);
     }
@@ -90,7 +90,7 @@ export class LoginController {
         const refreshToken = this.tokenService.tokenGenerator(usuario, process.env.REFRESH_TOKEN_EXPIRE);
         const rol = Rol[usuario.rol];
         // Habrá que modificar la ruta si es otra más adelante
-        res.redirect(301, process.env.FRONTEND_URL + '/?accessToken=' + accessToken + '&refreshToken=' + refreshToken + '&rol=' + rol + '#/login/callback');
+        res.redirect(301, process.env.FRONTEND_URL + '/login/callback?accessToken=' + accessToken + '&refreshToken=' + refreshToken + '&rol=' + rol);
     }
 
     /*
@@ -98,7 +98,7 @@ export class LoginController {
     * */
     @Get('failure')
     private loginGoogleCallBackFailure(req: Request, res: Response) {
-        res.redirect(301, process.env.FRONTEND_URL + '/#/');
+        res.redirect(301, process.env.FRONTEND_URL + '/?loginFailed=true');
     }
 
     /*
@@ -371,7 +371,7 @@ export class LoginController {
         const domain = process.env.MAILGUN_DOMAIN + '';
         const api_key = process.env.MAILGUN_API_KEY || '';
 
-        const linkReset = process.env.FRONTEND_URL + '/?tokenUserModify=' + tokensito + '#/change/password';
+        const linkReset = process.env.FRONTEND_URL + '/change/password?tokenUserModify=' + tokensito;
         const mailer = new Mailgun({
             apiKey: api_key,
             domain: domain,
