@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "rm -rf dist/ & tsc && node dist/App.js",
     "devWindows": "rd /s /Q dist & tsc && node dist/App.js",
-    "build": "rm -rf dist/ & tsc"
+    "build": "tsc"
   },
   "repository": {
     "type": "git",
