@@ -1,8 +1,7 @@
 FROM node:10
 WORKDIR /usr/src/node
 COPY package.json ./
-COPY .env ./
 COPY ./dist/ ./
-RUN npm install
+RUN npm i
 EXPOSE 3000
 CMD ["node", "App.js"]
