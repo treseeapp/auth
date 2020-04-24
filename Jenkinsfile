@@ -28,5 +28,15 @@ pipeline {
       }
     }
 
+    stage('Deploying image docker'){
+        steps  {
+            sh  '''
+                docker stop auth
+                docker container rm auth
+                docker run -d --name auth -v /jenkinsCredentials/.env:/usr/src/node/.env --network host auth-node
+                '''
+        }
+    }
+
   }
 }
