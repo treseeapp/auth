@@ -3,6 +3,6 @@ WORKDIR /usr/src/node
 COPY package.json ./
 COPY ./.env ./
 COPY ./dist/ ./
-RUN npm install
+COPY ./node_modules ./node_modules
 EXPOSE 3000
 CMD ["node", "App.js"]
