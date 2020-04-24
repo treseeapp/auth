@@ -19,6 +19,9 @@ pipeline {
     }
 
     stage('Construimos la imagen docker') {
+      when{
+        branch 'Produccion'
+      }
       steps {
         sh  '''
             pwd
@@ -29,6 +32,9 @@ pipeline {
     }
 
     stage('Deploying image docker'){
+        when{
+            branch 'Produccion'
+        }
         steps  {
             sh  '''
                 docker stop auth
