@@ -44,5 +44,13 @@ pipeline {
         }
     }
 
+    stage('Deploying to docker hub'){
+        when{
+            branch 'Produccion'
+        }
+        steps  {
+            echo "subimos a docker hub"
+        }
+    }
   }
 }
