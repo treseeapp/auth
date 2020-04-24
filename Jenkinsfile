@@ -20,7 +20,11 @@ pipeline {
 
     stage('Construimos la imagen docker') {
       steps {
-        sh 'docker build -t auth-node .'
+        sh  '''
+            pwd
+            ls -la
+            docker build -t auth-node .
+            '''
       }
     }
 
