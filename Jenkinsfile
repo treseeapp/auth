@@ -49,7 +49,12 @@ pipeline {
             branch 'Produccion'
         }
         steps  {
+        sh  '''
             echo "subimos a docker hub"
+            docker login --username=tresee --email=treseedevs@gmail.com
+            docker push tresee/auth-node:latest
+            '''
+
         }
     }
   }
