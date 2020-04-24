@@ -51,8 +51,9 @@ pipeline {
         steps  {
         sh  '''
             echo "subimos a docker hub"
+            docker tag auth-node tresee/auth-node:latest
             docker login --username=tresee -p TresEDevs!1
-            docker push tresee/auth-node:latest
+            docker push tresee/auth-node
             '''
 
         }
