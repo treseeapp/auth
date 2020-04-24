@@ -3,23 +3,45 @@ pipeline {
   stages {
     stage('Instalamos dependencias') {
       steps {
-        sh '''echo "Instalamos dependencias"
-npm i
-'''
+        sh  '''  echo "Instalamos dependencias"
+                 npm i
+            '''
       }
     }
 
     stage('Compilamos') {
       steps {
-        sh '''echo "Compilamos "
-npm run build'''
+        sh  '''
+            echo "Compilamos "
+            npm run build
+            '''
       }
     }
 
     stage('Construimos la imagen docker') {
-      steps {
-        sh 'docker build -t auth-node .'
+      when{
+        branch 'Produccion'
       }
+      steps {
+        sh  '''
+            pwd
+            ls -la
+            docker build -t auth-node .
+            '''
+      }
+    }
+
+    stage('Deploying image docker'){
+        when{
+            branch 'Produccion'
+        }
+        steps  {
+            sh  '''
+                docker stop auth
+                docker container rm auth
+                docker run -d --name auth -v /jenkinsCredentials/.env:/usr/src/node/.env --network host auth-node
+                '''
+        }
     }
 
   }
