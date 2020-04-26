@@ -54,6 +54,9 @@ pipeline {
             docker tag auth-node tresee/auth-node:latest
             docker login --username=tresee -p TresEDevs!1
             docker push tresee/auth-node
+            
+            docker tag auth-node docker.tresee.app/auth-node:latest
+            docker push docker.tresee.app/auth-node
             '''
 
         }
